@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <setParameter name="IIS Web Application Name" value="MaxithermalLoraWan" />
+  <setParameter name="Pexo63LorawanConnectionString-Web.config Connection String" value="Data Source=.\SQLEXPRESS;Initial Catalog=Pexo63Lorawan;User ID=nbiot;Password=12346789;MultipleActiveResultSets=True;Application Name=EntityFramework" />
+  <setParameter name="Pexo63LorawanEntities-Web.config Connection String" value="metadata=res://*/Models.LoraDB.csdl|res://*/Models.LoraDB.ssdl|res://*/Models.LoraDB.msl;provider=System.Data.SqlClient;provider connection string=&quot;data source=DGS_SERVER\SQLEXPRESS;initial catalog=Pexo63Lorawan;user id=nbiot;password=12346789;multipleactiveresultsets=True;application name=EntityFramework&quot;" />
+  <setParameter name="Pexo63LorawanEntities1-Web.config Connection String" value="metadata=res://*/Models.LoraDB.csdl|res://*/Models.LoraDB.ssdl|res://*/Models.LoraDB.msl;provider=System.Data.SqlClient;provider connection string=&quot;data source=.\SQLEXPRESS;initial catalog=Pexo63Lorawan;user id=nbiot;password=12346789;multipleactiveresultsets=True;application name=EntityFramework&quot;" />
+</parameters>

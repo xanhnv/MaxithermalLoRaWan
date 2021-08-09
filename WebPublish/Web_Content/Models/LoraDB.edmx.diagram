@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="9f0777069f494e3e80fcd699d19058a9" Name="Diagram1" ZoomLevel="93">
+        <EntityTypeShape EntityType="Pexo63LorawanModel.Alarm" Width="1.5" PointX="3" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.Datum" Width="1.5" PointX="3" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.Device" Width="1.5" PointX="5.5" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.Realtime" Width="1.5" PointX="3" PointY="8.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.Setting" Width="1.5" PointX="0.75" PointY="2.875" IsExpanded="true" />
+        <AssociationConnector Association="Pexo63LorawanModel.FK_Alarm_Settings" ManuallyRouted="false" />
+        <AssociationConnector Association="Pexo63LorawanModel.FK_Data_Settings" ManuallyRouted="false" />
+        <AssociationConnector Association="Pexo63LorawanModel.FK_Realtime_Settings" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

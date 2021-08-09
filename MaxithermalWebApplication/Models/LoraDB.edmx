@@ -1,0 +1,366 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Pexo63LorawanModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Alarm">
+          <Key>
+            <PropertyRef Name="Serial" />
+          </Key>
+          <Property Name="Serial" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="AlarmStatus1" Type="bit" Nullable="false" />
+          <Property Name="HighAlarmTemp" Type="float" Nullable="false" />
+          <Property Name="LowAlarmTemp" Type="float" Nullable="false" />
+          <Property Name="AlarmStatus2" Type="bit" Nullable="false" />
+          <Property Name="HighAlarmHumid" Type="float" Nullable="false" />
+          <Property Name="LowAlarmHumid" Type="float" Nullable="false" />
+          <Property Name="TttAlarm1" Type="float" Nullable="false" />
+          <Property Name="TttLowAlarm1" Type="float" Nullable="false" />
+          <Property Name="TttAlarm2" Type="float" Nullable="false" />
+          <Property Name="TttLowAlarm2" Type="float" Nullable="false" />
+          <Property Name="TimeUpdated" Type="text" />
+        </EntityType>
+        <EntityType Name="Data">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Serial" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Data1" Type="float" Nullable="false" />
+          <Property Name="Data2" Type="float" Nullable="false" />
+          <Property Name="Time" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Realtime">
+          <Key>
+            <PropertyRef Name="Serial" />
+          </Key>
+          <Property Name="Serial" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Status" Type="text" />
+          <Property Name="Data1" Type="text" />
+          <Property Name="Data2" Type="text" />
+          <Property Name="Runtime" Type="text" />
+          <Property Name="TimeUpdated" Type="text" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Settings">
+          <Key>
+            <PropertyRef Name="Serial" />
+          </Key>
+          <Property Name="Serial" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Description" Type="ntext" />
+          <Property Name="Location" Type="ntext" />
+          <Property Name="Email" Type="nvarchar" MaxLength="255" />
+          <Property Name="Unit" Type="text" />
+          <Property Name="Celsius" Type="bit" Nullable="false" />
+          <Property Name="Delay" Type="tinyint" Nullable="false" />
+          <Property Name="Starttime" Type="text" />
+          <Property Name="Stoptime" Type="text" />
+          <Property Name="Settingtime" Type="text" />
+          <Property Name="DurationDay" Type="int" Nullable="false" />
+          <Property Name="DurationHour" Type="tinyint" Nullable="false" />
+          <Property Name="IntervalSec" Type="tinyint" Nullable="false" />
+          <Property Name="IntervalMin" Type="tinyint" Nullable="false" />
+          <Property Name="IntervalHour" Type="tinyint" Nullable="false" />
+          <Property Name="ContinueMem" Type="bit" Nullable="false" />
+          <Property Name="Stopkey" Type="bit" Nullable="false" />
+          <Property Name="AutoStart" Type="bit" Nullable="false" />
+          <Property Name="IntervalSendLoraMin" Type="tinyint" Nullable="false" />
+          <Property Name="IntervalSendLoraHour" Type="tinyint" Nullable="false" />
+          <Property Name="IntervalSendLoraDay" Type="tinyint" Nullable="false" />
+          <Property Name="ContinueMemoryCount" Type="smallint" Nullable="false" />
+          <Property Name="Devicetype" Type="tinyint" Nullable="false" />
+          <Property Name="TimezoneId" Type="text" />
+          <Property Name="FirmwareVer" Type="text" />
+          <Property Name="SettingByLora" Type="bit" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Alarm_Settings">
+          <End Role="Settings" Type="Self.Settings" Multiplicity="1" />
+          <End Role="Alarm" Type="Self.Alarm" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Settings">
+              <PropertyRef Name="Serial" />
+            </Principal>
+            <Dependent Role="Alarm">
+              <PropertyRef Name="Serial" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Data_Settings">
+          <End Role="Settings" Type="Self.Settings" Multiplicity="1" />
+          <End Role="Data" Type="Self.Data" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Settings">
+              <PropertyRef Name="Serial" />
+            </Principal>
+            <Dependent Role="Data">
+              <PropertyRef Name="Serial" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Realtime_Settings">
+          <End Role="Settings" Type="Self.Settings" Multiplicity="1" />
+          <End Role="Realtime" Type="Self.Realtime" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Settings">
+              <PropertyRef Name="Serial" />
+            </Principal>
+            <Dependent Role="Realtime">
+              <PropertyRef Name="Serial" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Pexo63LorawanModelStoreContainer">
+          <EntitySet Name="Alarm" EntityType="Self.Alarm" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Data" EntityType="Self.Data" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Realtime" EntityType="Self.Realtime" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Settings" EntityType="Self.Settings" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Alarm_Settings" Association="Self.FK_Alarm_Settings">
+            <End Role="Settings" EntitySet="Settings" />
+            <End Role="Alarm" EntitySet="Alarm" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Data_Settings" Association="Self.FK_Data_Settings">
+            <End Role="Settings" EntitySet="Settings" />
+            <End Role="Data" EntitySet="Data" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Realtime_Settings" Association="Self.FK_Realtime_Settings">
+            <End Role="Settings" EntitySet="Settings" />
+            <End Role="Realtime" EntitySet="Realtime" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Pexo63LorawanModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Data">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Serial" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Data1" Type="Double" Nullable="false" />
+          <Property Name="Data2" Type="Double" Nullable="false" />
+          <Property Name="Time" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Setting" Relationship="Pexo63LorawanModel.FK_Data_Settings" FromRole="Data" ToRole="Setting" />
+        </EntityType>
+        <EntityType Name="Realtime">
+          <Key>
+            <PropertyRef Name="Serial" />
+          </Key>
+          <Property Name="Serial" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Data1" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Data2" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Runtime" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="TimeUpdated" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Setting" Relationship="Pexo63LorawanModel.FK_Realtime_Settings" FromRole="Realtime" ToRole="Setting" />
+        </EntityType>
+        <EntityContainer Name="Pexo63LorawanEntities1" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Data1" EntityType="Pexo63LorawanModel.Data" />
+          <EntitySet Name="Realtimes" EntityType="Self.Realtime" />
+          <EntitySet Name="Alarms" EntityType="Pexo63LorawanModel.Alarm" />
+          <EntitySet Name="Settings" EntityType="Pexo63LorawanModel.Setting" />
+          <AssociationSet Name="FK_Alarm_Settings" Association="Pexo63LorawanModel.FK_Alarm_Settings">
+            <End Role="Setting" EntitySet="Settings" />
+            <End Role="Alarm" EntitySet="Alarms" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Data_Settings" Association="Pexo63LorawanModel.FK_Data_Settings">
+            <End Role="Setting" EntitySet="Settings" />
+            <End Role="Data" EntitySet="Data1" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Realtime_Settings" Association="Pexo63LorawanModel.FK_Realtime_Settings">
+            <End Role="Setting" EntitySet="Settings" />
+            <End Role="Realtime" EntitySet="Realtimes" />
+          </AssociationSet>
+          </EntityContainer>
+        <EntityType Name="Alarm">
+          <Key>
+            <PropertyRef Name="Serial" />
+          </Key>
+          <Property Name="Serial" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="AlarmStatus1" Type="Boolean" Nullable="false" />
+          <Property Name="HighAlarmTemp" Type="Double" Nullable="false" />
+          <Property Name="LowAlarmTemp" Type="Double" Nullable="false" />
+          <Property Name="AlarmStatus2" Type="Boolean" Nullable="false" />
+          <Property Name="HighAlarmHumid" Type="Double" Nullable="false" />
+          <Property Name="LowAlarmHumid" Type="Double" Nullable="false" />
+          <Property Name="TttAlarm1" Type="Double" Nullable="false" />
+          <Property Name="TttLowAlarm1" Type="Double" Nullable="false" />
+          <Property Name="TttAlarm2" Type="Double" Nullable="false" />
+          <Property Name="TttLowAlarm2" Type="Double" Nullable="false" />
+          <Property Name="TimeUpdated" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Setting" Relationship="Pexo63LorawanModel.FK_Alarm_Settings" FromRole="Alarm" ToRole="Setting" />
+        </EntityType>
+        <EntityType Name="Setting">
+          <Key>
+            <PropertyRef Name="Serial" />
+          </Key>
+          <Property Name="Serial" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Location" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Unit" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Celsius" Type="Boolean" Nullable="false" />
+          <Property Name="Delay" Type="Byte" Nullable="false" />
+          <Property Name="Starttime" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Stoptime" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Settingtime" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="DurationDay" Type="Int32" Nullable="false" />
+          <Property Name="DurationHour" Type="Byte" Nullable="false" />
+          <Property Name="IntervalSec" Type="Byte" Nullable="false" />
+          <Property Name="IntervalMin" Type="Byte" Nullable="false" />
+          <Property Name="IntervalHour" Type="Byte" Nullable="false" />
+          <Property Name="ContinueMem" Type="Boolean" Nullable="false" />
+          <Property Name="Stopkey" Type="Boolean" Nullable="false" />
+          <Property Name="AutoStart" Type="Boolean" Nullable="false" />
+          <Property Name="IntervalSendLoraMin" Type="Byte" Nullable="false" />
+          <Property Name="IntervalSendLoraHour" Type="Byte" Nullable="false" />
+          <Property Name="IntervalSendLoraDay" Type="Byte" Nullable="false" />
+          <Property Name="Devicetype" Type="Byte" Nullable="false" />
+          <Property Name="TimezoneId" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="FirmwareVer" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="SettingByLora" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Alarm" Relationship="Pexo63LorawanModel.FK_Alarm_Settings" FromRole="Setting" ToRole="Alarm" />
+          <NavigationProperty Name="Data" Relationship="Pexo63LorawanModel.FK_Data_Settings" FromRole="Setting" ToRole="Data" />
+          <NavigationProperty Name="Realtime" Relationship="Pexo63LorawanModel.FK_Realtime_Settings" FromRole="Setting" ToRole="Realtime" />
+          <Property Name="ContinueMemoryCount" Type="Int16" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Alarm_Settings">
+          <End Type="Pexo63LorawanModel.Setting" Role="Setting" Multiplicity="1" />
+          <End Type="Pexo63LorawanModel.Alarm" Role="Alarm" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Setting">
+              <PropertyRef Name="Serial" />
+            </Principal>
+            <Dependent Role="Alarm">
+              <PropertyRef Name="Serial" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Data_Settings">
+          <End Type="Pexo63LorawanModel.Setting" Role="Setting" Multiplicity="1" />
+          <End Type="Pexo63LorawanModel.Data" Role="Data" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Setting">
+              <PropertyRef Name="Serial" />
+            </Principal>
+            <Dependent Role="Data">
+              <PropertyRef Name="Serial" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Realtime_Settings">
+          <End Type="Pexo63LorawanModel.Setting" Role="Setting" Multiplicity="1" />
+          <End Type="Pexo63LorawanModel.Realtime" Role="Realtime" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Setting">
+              <PropertyRef Name="Serial" />
+            </Principal>
+            <Dependent Role="Realtime">
+              <PropertyRef Name="Serial" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Pexo63LorawanModelStoreContainer" CdmEntityContainer="Pexo63LorawanEntities1">
+          <EntitySetMapping Name="Data1">
+            <EntityTypeMapping TypeName="Pexo63LorawanModel.Data">
+              <MappingFragment StoreEntitySet="Data">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Serial" ColumnName="Serial" />
+                <ScalarProperty Name="Data1" ColumnName="Data1" />
+                <ScalarProperty Name="Data2" ColumnName="Data2" />
+                <ScalarProperty Name="Time" ColumnName="Time" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Realtimes">
+            <EntityTypeMapping TypeName="Pexo63LorawanModel.Realtime">
+              <MappingFragment StoreEntitySet="Realtime">
+                <ScalarProperty Name="Serial" ColumnName="Serial" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Data1" ColumnName="Data1" />
+                <ScalarProperty Name="Data2" ColumnName="Data2" />
+                <ScalarProperty Name="Runtime" ColumnName="Runtime" />
+                <ScalarProperty Name="TimeUpdated" ColumnName="TimeUpdated" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Alarms">
+            <EntityTypeMapping TypeName="Pexo63LorawanModel.Alarm">
+              <MappingFragment StoreEntitySet="Alarm">
+                <ScalarProperty Name="TimeUpdated" ColumnName="TimeUpdated" />
+                <ScalarProperty Name="TttLowAlarm2" ColumnName="TttLowAlarm2" />
+                <ScalarProperty Name="TttAlarm2" ColumnName="TttAlarm2" />
+                <ScalarProperty Name="TttLowAlarm1" ColumnName="TttLowAlarm1" />
+                <ScalarProperty Name="TttAlarm1" ColumnName="TttAlarm1" />
+                <ScalarProperty Name="LowAlarmHumid" ColumnName="LowAlarmHumid" />
+                <ScalarProperty Name="HighAlarmHumid" ColumnName="HighAlarmHumid" />
+                <ScalarProperty Name="AlarmStatus2" ColumnName="AlarmStatus2" />
+                <ScalarProperty Name="LowAlarmTemp" ColumnName="LowAlarmTemp" />
+                <ScalarProperty Name="HighAlarmTemp" ColumnName="HighAlarmTemp" />
+                <ScalarProperty Name="AlarmStatus1" ColumnName="AlarmStatus1" />
+                <ScalarProperty Name="Serial" ColumnName="Serial" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Settings">
+            <EntityTypeMapping TypeName="Pexo63LorawanModel.Setting">
+              <MappingFragment StoreEntitySet="Settings">
+                <ScalarProperty Name="ContinueMemoryCount" ColumnName="ContinueMemoryCount" />
+                <ScalarProperty Name="SettingByLora" ColumnName="SettingByLora" />
+                <ScalarProperty Name="FirmwareVer" ColumnName="FirmwareVer" />
+                <ScalarProperty Name="TimezoneId" ColumnName="TimezoneId" />
+                <ScalarProperty Name="Devicetype" ColumnName="Devicetype" />
+                <ScalarProperty Name="IntervalSendLoraDay" ColumnName="IntervalSendLoraDay" />
+                <ScalarProperty Name="IntervalSendLoraHour" ColumnName="IntervalSendLoraHour" />
+                <ScalarProperty Name="IntervalSendLoraMin" ColumnName="IntervalSendLoraMin" />
+                <ScalarProperty Name="AutoStart" ColumnName="AutoStart" />
+                <ScalarProperty Name="Stopkey" ColumnName="Stopkey" />
+                <ScalarProperty Name="ContinueMem" ColumnName="ContinueMem" />
+                <ScalarProperty Name="IntervalHour" ColumnName="IntervalHour" />
+                <ScalarProperty Name="IntervalMin" ColumnName="IntervalMin" />
+                <ScalarProperty Name="IntervalSec" ColumnName="IntervalSec" />
+                <ScalarProperty Name="DurationHour" ColumnName="DurationHour" />
+                <ScalarProperty Name="DurationDay" ColumnName="DurationDay" />
+                <ScalarProperty Name="Settingtime" ColumnName="Settingtime" />
+                <ScalarProperty Name="Stoptime" ColumnName="Stoptime" />
+                <ScalarProperty Name="Starttime" ColumnName="Starttime" />
+                <ScalarProperty Name="Delay" ColumnName="Delay" />
+                <ScalarProperty Name="Celsius" ColumnName="Celsius" />
+                <ScalarProperty Name="Unit" ColumnName="Unit" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Location" ColumnName="Location" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Serial" ColumnName="Serial" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

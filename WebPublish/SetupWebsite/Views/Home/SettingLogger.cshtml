@@ -1,0 +1,287 @@
+﻿@model MaxithermalWebApplication.Models.Setting
+
+
+@{
+    ViewBag.Title = "Settings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .duraionDiv {
+        margin-bottom: 15px;
+    }
+</style>
+
+
+<h2>Settings</h2>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <h4>Logger: <b>@Model.Serial</b></h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.Serial)
+
+
+    <div class="row duraionDiv">
+        @Html.LabelFor(model => model.DurationDay, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-2">
+
+            @*<input class="form-control text-box single-line"
+                data-val="true" data-val-number="The field Duration day must be a number."
+                id="DurationDay"
+                name="DurationDay"
+                type="number"
+                value=@Model.DurationDay
+                min="0"
+                maxlength="3"
+                max="365">*@
+            @Html.EditorFor(model => model.DurationDay, new { htmlAttributes = new { @class = "form-control", @min="0",@max= "365"} })
+            @Html.ValidationMessageFor(model => model.DurationDay, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-1">
+            <label class="control-label">Day</label>
+        </div>
+        <div class="col-md-2">
+            @*<input class="form-control text-box single-line" data-val="true"
+                data-val-number="The field Duration hour must be a number."
+                id="DurationHour" name="DurationHour" type="number" value=@Model.DurationHour
+                min="0" max="24" maxlength="2">*@
+            @Html.EditorFor(model => model.DurationHour, new { htmlAttributes = new { @class = "form-control", @min = "0", @max = "23" } })
+            @Html.ValidationMessageFor(model => model.DurationHour, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-1">
+            <label class="control-label">Hour</label>
+        </div>
+
+    </div>
+
+    <div class="row duraionDiv">
+        <label class="control-label col-md-2">Interval</label>
+        <div class="col-md-2">
+            @*<input class="form-control text-box single-line" data-val="true"
+                data-val-number="The field Interval hour day must be a number." id="IntervalHour"
+                name="IntervalHour" type="number" value=@intervalSplit[0] maxlength="2"
+                min="0" max="59">*@
+            @Html.EditorFor(model => model.IntervalHour, new { htmlAttributes = new { @class = "form-control", @min = "0", @max = "23" } })
+            @Html.ValidationMessageFor(model => model.IntervalHour, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-1">
+            <label class="control-label">Hour</label>
+        </div>
+        <div class="col-md-2">
+            @*<input class="form-control text-box single-line" data-val="true"
+                data-val-number="The field Interval Min day must be a number."
+                id="IntervalMin" name="IntervalMin" type="number" value=@intervalSplit[3] min="0" max="59" maxlength="2">*@
+            @Html.EditorFor(model => model.IntervalMin, new { htmlAttributes = new { @class = "form-control", @min = "0", @max = "59" } })
+            @Html.ValidationMessageFor(model => model.IntervalMin, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-1">
+            <label class="control-label">Minute</label>
+        </div>
+        <div class="col-md-2">
+            @*<input class="form-control text-box single-line" data-val="true"
+                data-val-number="The field Interval Sec day must be a number."
+                id="IntervalSec" name="IntervalSec" type="number" value=@intervalSplit[5] min="0" , max="59" maxlength="2">*@
+            @Html.EditorFor(model => model.IntervalSec, new { htmlAttributes = new { @class = "form-control", @min = "0", @max = "59" } })
+            @Html.ValidationMessageFor(model => model.IntervalSec, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-2">
+            <label class="control-label">Second</label>
+        </div>
+
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2" for="Unit">Unit temp</label>
+
+        <div class="col-md-10">
+
+            @Html.RadioButtonFor(model => model.Celsius, true) Celsius
+            @Html.RadioButtonFor(model => model.Celsius, false) Fahrenheit
+            @Html.ValidationMessageFor(model => model.Celsius, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2" for="ContinueMem">Continue memory</label>
+        <div class="col-md-10">
+
+
+            @Html.RadioButtonFor(model => model.ContinueMem, true) Yes
+            @Html.RadioButtonFor(model => model.ContinueMem, false) No
+            @Html.ValidationMessageFor(model => model.ContinueMem, "", new { @class = "text-danger" })
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2" for="ContinueMem">Stop key </label>
+        <div class="col-md-10">
+
+            @Html.RadioButtonFor(model => model.Stopkey, true) Yes
+            @Html.RadioButtonFor(model => model.Stopkey, false) No
+            @Html.ValidationMessageFor(model => model.Stopkey, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+
+   
+    <div class="row">
+        <label class="control-label col-md-2">Period send data</label>
+        <div class="col-md-2">
+            @Html.EditorFor(model => model.IntervalSendLoraDay, new { htmlAttributes = new { @class = "form-control", @min = "0", @max = "255" } })
+            @Html.ValidationMessageFor(model => model.IntervalSendLoraDay, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-1">
+            <label class="control-label">Day</label>
+        </div>
+        <div class="col-md-2">
+            @Html.EditorFor(model => model.IntervalSendLoraHour, new { htmlAttributes = new { @class = "form-control", @min = "0", @max = "23" } })
+            @Html.ValidationMessageFor(model => model.IntervalSendLoraHour, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-1">
+            <label class="control-label">Hour</label>
+        </div>
+        <div class="col-md-2">
+            @Html.EditorFor(model => model.IntervalSendLoraMin, new { htmlAttributes = new { @class = "form-control", @min = "0", @max = "59" } })
+            @Html.ValidationMessageFor(model => model.IntervalSendLoraMin, "", new { @class = "text-danger" })
+        </div>
+        <div class="col-md-2">
+            <label class="control-label">Min</label>
+        </div>
+
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">Alarm channel 1</label>
+        <div class="col-md-10">
+            <div class="checkbox">
+                @Html.RadioButtonFor(model => model.Alarm.AlarmStatus1, true) Enable
+                @Html.RadioButtonFor(model => model.Alarm.AlarmStatus1, false) Disable
+                @Html.ValidationMessageFor(model => model.Alarm.AlarmStatus1, "", new { @class = "text-danger" })
+
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.HiddenFor(model => model.Alarm.Serial)
+        <label class="control-label col-md-2">High alarm</label>
+        <div class="col-md-10">
+            @{
+
+                if (Model.Alarm.AlarmStatus1)
+                {
+                    @Html.EditorFor(model => model.Alarm.HighAlarmTemp, "", new { htmlAttributes = new { @class = "form-control" } })
+                }
+                else
+                {
+                    @Html.EditorFor(model => model.Alarm.HighAlarmTemp, "", new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
+                }
+
+            }
+
+            @Html.ValidationMessageFor(model => model.Alarm.HighAlarmTemp, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-md-2">Low alarm</label>
+        <div class="col-md-10">
+            @if (Model.Alarm.AlarmStatus1)
+            {
+                @Html.EditorFor(model => model.Alarm.LowAlarmTemp, new { htmlAttributes = new { @class = "form-control" } })
+            }
+            else
+            {
+                @Html.EditorFor(model => model.Alarm.LowAlarmTemp, new { htmlAttributes = new { @class = "form-control", @disabled="disabled" } })
+            }
+
+            @Html.ValidationMessageFor(model => model.Alarm.LowAlarmTemp, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">Alarm channel 2</label>
+        <div class="col-md-10">
+            <div class="checkbox">
+
+                @Html.RadioButtonFor(model => model.Alarm.AlarmStatus2, true) Enable
+                @Html.RadioButtonFor(model => model.Alarm.AlarmStatus2, false) Disable
+                @Html.ValidationMessageFor(model => model.Alarm.AlarmStatus2, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2">High alarm</label>
+        <div class="col-md-10">
+            @if (Model.Alarm.AlarmStatus2)
+            {
+                @Html.EditorFor(model => model.Alarm.HighAlarmHumid, new { htmlAttributes = new { @class = "form-control" } })
+            }
+            else
+            {
+                @Html.EditorFor(model => model.Alarm.HighAlarmHumid, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
+            }
+
+            @Html.ValidationMessageFor(model => model.Alarm.HighAlarmHumid, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-md-2">Low alarm</label>
+        <div class="col-md-10">
+            @if (Model.Alarm.AlarmStatus2)
+            {
+                @Html.EditorFor(model => model.Alarm.LowAlarmHumid, new { htmlAttributes = new { @class = "form-control" } })
+            }
+            else
+            {
+                @Html.EditorFor(model => model.Alarm.LowAlarmHumid, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
+            }
+
+            @Html.ValidationMessageFor(model => model.Alarm.LowAlarmHumid, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    @*<div class="form-group">
+            <label class="control-label col-md-2">Auto start</label>
+            <div class="col-md-10">
+                <div class="checkbox">
+                    @Html.EditorFor(model => model.AlarmStatus)
+                    @Html.ValidationMessageFor(model => model.AlarmStatus, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <lable class="control-label col-md-2">Start at</lable>
+            <div class="col-md-10">
+                <div class="row">
+                    <div class='col-sm-6'>
+                        <input type='text' class="form-control" id='datetimepicker4' />
+                    </div>
+                    <script type="text/javascript">
+                        $(function () {
+                            $('#datetimepicker4').datetimepicker();
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>*@
+
+
+    <div class="form-group">
+        @Html.Label("Delay start (min)", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Delay, new { htmlAttributes = new { @class = "form-control", @min = "0", @max = "255" } })
+            @Html.ValidationMessageFor(model => model.Delay, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Save" class="btn btn-default" id="btnSave" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+@Scripts.Render("~/Scripts/MyJavaScript.js")

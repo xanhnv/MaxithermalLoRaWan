@@ -1,0 +1,168 @@
+﻿@model MaxithermalWebApplication.Models.Alarm
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div>
+    <h4>Alarm details</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            Logger
+        </dt>
+        <dd>
+            @{
+                if (Model != null)
+                {
+                    @Html.DisplayFor(model => model.Serial)
+                }
+                else
+                {
+                    @ViewBag.ID
+                }
+            }
+
+        </dd>
+
+        <dt>
+            Email
+        </dt>
+        <dd>
+            @if (Model != null)
+            {
+                @Html.DisplayFor(model => model.Setting.Email)
+            }
+        </dd>
+
+        <dt>
+            Hight alarm temp
+        </dt>
+        <dd>
+            @if (Model != null)
+            {
+                if (Model.AlarmStatus1)
+                {
+                    @Html.DisplayFor(model => model.HighAlarmTemp)
+                }
+                else
+                {
+                    <text>No alarm</text>
+                }
+
+            }
+        </dd>
+
+        <dt>
+            Low alarm temp
+        </dt>
+        <dd>
+            @if (Model != null)
+            {
+                if (Model.AlarmStatus1)
+                {
+                    @Html.DisplayFor(model => model.LowAlarmTemp)
+                }
+                else
+                {
+                    <text>No alarm</text>
+                }
+               
+            }
+        </dd>
+
+        <dt>
+            High alarm humid
+        </dt>
+        <dd>
+            @if (Model != null)
+            {
+                if (Model.AlarmStatus2)
+                {
+                    @Html.DisplayFor(model => model.HighAlarmHumid)
+                }
+                else
+                {
+                    <text>No alarm</text>
+                }
+            }
+        </dd>
+
+        <dt>
+            Low alarm humid
+        </dt>
+        <dd>
+            @if (Model != null)
+            {
+                if (Model.AlarmStatus2)
+                {
+                    @Html.DisplayFor(model => model.LowAlarmHumid)
+                }
+                else
+                {
+                    <text>No alarm</text>
+                }
+            }
+        </dd>
+
+        <dt>
+            Total time alarm temp
+        </dt>
+
+        <dd>
+            @if (Model != null)
+            {
+                @TimeSpan.FromSeconds(Model.TttAlarm1).ToString()
+            }
+        </dd>
+
+        <dt>
+            Total time low alarm
+        </dt>
+
+        <dd>
+            @if (Model != null)
+            {
+                @TimeSpan.FromSeconds(Model.TttLowAlarm1).ToString()
+            }
+        </dd>
+
+        <dt>
+            Total time alarm humid
+        </dt>
+
+        <dd>
+            @if (Model != null)
+            {
+                @TimeSpan.FromSeconds(Model.TttAlarm2).ToString()
+            }
+        </dd>
+
+        <dt>
+            Total time alarm humid
+        </dt>
+
+        <dd>
+            @if (Model != null)
+            {
+                @TimeSpan.FromSeconds(Model.TttLowAlarm2).ToString()
+            }
+        </dd>
+
+        <dt>
+            Time updated
+        </dt>
+
+        <dd>
+            @if (Model != null)
+            {
+                @Html.DisplayFor(model => model.TimeUpdated)
+            }
+        </dd>
+
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "Index", "Home")
+</p>

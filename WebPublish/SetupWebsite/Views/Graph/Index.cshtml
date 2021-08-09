@@ -1,0 +1,305 @@
+﻿
+@{
+    ViewBag.Title = "Graph ";
+    Layout = "~/Views/Shared/_Graph.cshtml";
+}
+
+@model MaxithermalWebApplication.Models.Setting
+<head>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/Chart.min.js"></script>
+    <script src="~/Scripts/chartjs-plugin-annotation.min.js"></script>
+</head>
+
+<div Style="font-family: Corbel; font-size: small ;text-align:center " class="row">
+    <div style="width:100%;height:80%">
+        @*<input type="button" value="New Data" onclick="RandomData()">*@
+        <canvas id="myChart" style="padding: 0;margin: auto;display: block; "> </canvas>
+
+    </div>
+</div>
+<script>
+    // create initial empty chart
+    var ctx = $("#myChart").get(0).getContext("2d");
+    @*var backgroundAnnotation = 'rgb(51, 51, 255, 0.1';
+    if (@Model.Alarm.HighAlarmTemp<1000) {
+        backgroundAnnotation = 'rgb(51, 51, 255, 0.1)';
+    }
+    else {
+        backgroundAnnotation = 'rgb(51, 51, 255, 0.0)';
+    }*@
+    var titleY2axis = "Humidity (%)";
+    var titleY1axis = "";
+    if ('@Model.Unit' == 'Celsius') {
+        titleY1axis = "Temperature(°C)";
+    }
+    else {
+        titleY1axis = "Temperature(°F)";
+    }
+    var visibleY2axis = false;
+    var series1Name, series2Name;
+   
+    
+    switch (@Model.Devicetype) {
+        case 17://0x11
+            series1Name = "Room temperature";
+            series2Name = "Humidity";
+            break;
+        case 34: //0x22
+            series1Name = "LN2";
+            series2Name = "Humidity";
+            break;
+        case 51: //0x33
+            series1Name = "RTD2";
+            series2Name = "Humidity";
+            break;
+        case 68: //0x44
+            series1Name = "Room temperature";
+            series2Name = "LN2";
+            break;
+        case 85://0x55
+            series1Name = "Room temperature";
+            series2Name = "RTD2";
+            break;
+        case 102://0x66
+            series1Name = "Thermal couple";
+            series2Name = "Humidity";
+            break;
+        case 119://0x77
+            series1Name = "Room temperature";
+            series2Name = "Thermal couple";
+            break;
+        default:
+            series1Name = "Room temperature";
+            series2Name = "Humidity";
+    }
+    if (@Model.Devicetype== 17 || @Model.Devicetype== 34 || @Model.Devicetype== 51 || @Model.Devicetype== 102) {
+        visibleY2axis = true;
+    } else
+        visibleY2axis = false;
+    
+    var myNewChart = new Chart(ctx, {
+        type: 'line',
+        data: [],
+        options: {
+            responsive: true,
+            title: { display: true, text: ['Logger: @ViewBag.ID @ViewBag.Timezone, @Model.Description','Location: @Model.Location'] },
+            legend: { position: 'top' },
+            scales: {
+                xAxes:
+                [
+                    {
+                        gridLines: { display: true },
+                        display: true,
+                        scaleLabel: { display: false, labelString: '' },
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: 12
+                        },
+
+
+                    }
+                ],
+                yAxes:
+                [
+                    {
+                        gridLines: { display: true },
+                        display: true, scaleLabel: { display: false, labelString: '' },
+                        ticks:
+                        {
+                           
+                            beginAtZero: false,
+                            maxTicksLimit: 10,
+
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: titleY1axis,
+                        },
+                        position: 'left',
+                        id: 'y-axis-1',
+                    },
+                        {
+                            display: visibleY2axis,
+                        position: 'right',
+                        id: 'y-axis-2',
+
+                        // grid line settings
+                        gridLines: {
+                            display: false,
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: titleY2axis
+                        },
+
+                    },
+                ]
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: true,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: false
+            },
+            showLines: true, // disable/anable  for all datasets
+            elements: {
+                line: {
+                    tension: 0, // disables bezier curves
+                    borderWidth:5
+                },
+                point: {
+                    radius: 0
+                },
+
+            },
+            spanGaps: true, // enable for all datasets
+            showLine: false // disable for all datasets
+              @*annotation:
+                 {
+
+                     annotations: [{
+                     type: 'box',
+                    drawTime: 'beforeDatasetsDraw',
+                    yScaleID: 'y-axis-1',
+                    yMin: @Model.HighAlarmTemp,
+                    yMax: @Model.LowAlarmTemp,
+                    backgroundColor: backgroundAnnotation,
+
+                }]
+            }*@
+
+        }
+    });
+
+    //Record ID
+    var lastRecordID;
+    // logic to get new data
+    var getAllData = function ()
+    {
+        $.ajax({
+            type: "POST",
+            url: "/Graph/Chart/@ViewBag.ID",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (chData) {
+                var aData = chData;
+                //var aLabels = aData[2];
+                var dateUnix = chData[2];
+                //var aLabels = [dateUnix.length];
+                //for (var i = 0; i < dateUnix.length; i++) {
+                //    aLabels[i] = new Date(dateUnix[i] * 1000).toLocaleTimeString();
+                //}
+                //lastRecordID = aLabels[aLabels.length - 1];
+                //console.log(lastRecordID);
+                var aLabels = chData[2];
+                var aDatasets1 = aData[0];
+                var DataSet2 = aData[1];
+                var yaxisID2 = 'y-axis-1';
+                if (visibleY2axis == true) {
+                    yaxisID2 = 'y-axis-2';
+                }
+                else {
+                    yaxisID2 = 'y-axis-1';
+                }
+                var dataChart = {
+                    labels: aLabels,
+                    datasets:
+                    [
+                            {
+                                label: series1Name,
+                            data: aDatasets1,
+                            fill: false,
+                            borderColor: 'rgba(52, 67, 235, 0.97)',
+                            backgroundColor: 'rgba(52, 67, 235, 0.97)',
+                            borderWidth: 1,
+                            yAxisID: 'y-axis-1',
+                        },
+                            {
+                                label: series2Name,
+                            data: DataSet2,
+                            fill: false,
+                            borderColor: 'rgba(52, 235, 89, 1)',
+                            backgroundColor: 'rgba(52, 235, 89, 1)',
+                            borderWidth: 1,
+                            yAxisID: yaxisID2,
+                        }
+                    ]
+                };
+                // add label and data point to chart
+                myNewChart.label = aLabels;
+                myNewChart.data = dataChart;
+
+                // re-render the chart
+                myNewChart.update();
+            }
+        });
+    }
+    getAllData();
+
+    // get new data every  seconds
+     //setInterval(GetNewestData, 1000);
+    //GetNewestData();
+    var postId = 1;
+    function RandomData() {
+        // add new label and data point to chart's underlying data structures
+        myNewChart.data.labels.push("Post " + postId++);
+        myNewChart.data.datasets[0].data.push(getRandomIntInclusive(1, 25));
+        // re-render the chart
+        myNewChart.update();
+    }
+    function getRandomIntInclusive(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + max * 100;
+    }
+    function GetNewestData() {
+        $.ajax({
+            type: "POST",
+            url: "/Graph/GetNewData/@ViewBag.ID",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (data) {
+
+                //var date = new Date(data.Time * 1000);
+                //console.log("Date : " + date);
+                //console.log("Date to locale time string: " + date.toLocaleTimeString());
+                //console.log("Date to locale date string: " + date.toLocaleDateString());
+                //console.log("Date to iso date string: " + date.toISOString());
+                //console.log("Date to utc date string: " + date.toUTCString());
+                //console.log("Date to string: " + date.toString());
+                //let formatted_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
+                //console.log("Formated date: "+ formatted_date)
+                //console.log("last time on chart: " + myNewChart.data.labels[myNewChart.data.labels.length - 1]);
+
+                if (data.Time != myNewChart.data.labels[myNewChart.data.labels.length - 1]) {
+                    // add new label and data point to chart's underlying data structures
+                    myNewChart.data.labels.push(data.Time);
+                    //myNewChart.data.labels.push(date.toLocaleDateString());
+                    myNewChart.data.datasets[0].data.push(data.Data1);
+                    myNewChart.data.datasets[1].data.push(data.Data2);
+                    // re-render the chart
+                    myNewChart.update();
+                }
+            }
+        });
+    }
+    document.getElementById("download").addEventListener('click', function(){
+        var image = document.getElementById("myChart").toDataURL("image/png");
+            image = image.replace('data:image/png;base64,', '');
+
+            $.ajax({
+                type: 'POST',
+                url: '/graph/SaveImage',
+                data: '{ "imageData" : "' + image + '" }',
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (msg) {
+                    alert('Image saved!');
+                }
+            });
+    });
+</script>
+

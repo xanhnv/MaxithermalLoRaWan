@@ -1,0 +1,169 @@
+﻿@model MaxithermalWebApplication.Models.Setting
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Setting</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Location)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Location)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Unit)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Unit)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Delay)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Delay)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Starttime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Starttime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Stoptime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Stoptime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Settingtime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Settingtime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Duration)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Duration)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Interval)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Interval)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.HighAlarmTemp)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.HighAlarmTemp)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LowAlarmTemp)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LowAlarmTemp)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.HighAlarmHumid)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.HighAlarmHumid)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LowAlarmHumid)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LowAlarmHumid)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AlarmStatus)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AlarmStatus)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FirmwareVer)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FirmwareVer)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Alarm.TimeUpdated)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Alarm.TimeUpdated)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Realtime.Status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Realtime.Status)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>
