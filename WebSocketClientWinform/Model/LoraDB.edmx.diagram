@@ -14,7 +14,10 @@
         <AssociationConnector Association="Pexo63LorawanModel.FK_Realtime_Settings" />
         <EntityTypeShape EntityType="Pexo63LorawanModel.Device" Width="1.5" PointX="0.75" PointY="0.75" />
         <EntityTypeShape EntityType="Pexo63LorawanModel.sysdiagram" Width="1.5" PointX="2.75" PointY="0.75" />
-      </Diagram>
+        <EntityTypeShape EntityType="Pexo63LorawanModel.PacketD0" Width="1.5" PointX="5.375" PointY="0.75" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.PacketD1" Width="1.5" PointX="7.375" PointY="0.75" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.PacketD2" Width="1.5" PointX="9.375" PointY="0.75" />
+        </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

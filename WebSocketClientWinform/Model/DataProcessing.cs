@@ -58,6 +58,20 @@ namespace UDPServerAndWebSocketClient
             }
             return false;
         }
+        public bool CheckExistPacketD0(byte[] devAdd)
+        {
+            using (var db = new Pexo63LorawanEntities())
+            {
+                foreach (var item in db.Devices)
+                {
+                    if (item.DeviceAddress.SequenceEqual(devAdd))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
         string GetDeviceType(byte dt)
         {
             string deviceType = "";
@@ -107,6 +121,11 @@ namespace UDPServerAndWebSocketClient
             else
                 return data / 10.0;
         }
+        /// <summary>
+        /// Get realTime D0 and MissData A0 packet 1
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="Serial"></param>
         public void GetRealtimeD0(byte[] data, string Serial)
         {
             try
@@ -119,74 +138,93 @@ namespace UDPServerAndWebSocketClient
                         return;
                     }
                     var datalist = new List<Data>();
-                    int package = data[7] + data[8] * 256;//number of the package
 
                     int interval = rcst.IntervalSec + rcst.IntervalMin * 60 + rcst.IntervalHour * 3600;//Total second of interval time
                     int numOfDt = (rcst.DurationHour + rcst.DurationDay * 24) * 3600 / interval;//all data
-                    //if (package == 0)
-                    //{
 
-                    //    if (rcst.ContinueMem)
-                    //    {
-
-                    //        if (db.Data1.Where(u => u.Serial == Serial).ToList().Count >= numOfDt)
-                    //        {
-                    //            rcst.ContinueMemoryCount++;
-                    //        }
-                    //    }
-                    //}
-                    if (rcst.ContinueMem)
-                    {
-                        rcst.ContinueMemoryCount = (short) (db.Data1.Where(u => u.Serial == Serial).ToList().Count / numOfDt);
-                    }
                     int dataPerPacket = ((rcst.IntervalSendLoraMin + rcst.IntervalSendLoraHour * 60 + rcst.IntervalSendLoraDay * 24 * 60) * 60) / (interval);//num of data per package must sent to server
+                    int package = 0;
 
-                    double data1 = convertTemFrom15bit((data[9] + data[10] * 256), 10);
-                    double data2 = convertTemFrom15bit((data[11] + data[12] * 256), 10);
-                    double delta1 = 0, delta2 = 0;
-                    DateTime startTime = DateTime.Parse(rcst.Starttime);
-                    //first data of packet
-                    Data dtFirt = new Data();
-                    dtFirt.Serial = Serial;
-                    dtFirt.Data1 = data1;
-                    dtFirt.Data2 = data2;
-                    startTime = startTime.AddSeconds((rcst.ContinueMemoryCount * numOfDt + dataPerPacket * package) * interval);
-                    Console.WriteLine("a Packet: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime + ", Continue Mem Count: " + rcst.ContinueMemoryCount);
-                    string mesLog = Serial + ","+ startTime.ToString() + "," +"D0"+","+ rcst.ContinueMemoryCount+","+ package + "," + data1 + "," + data2;
-                    Utilities.WriteLogDebug(mesLog);
-                    dtFirt.Time = startTime;
-                    datalist.Add(dtFirt);
-                    int j = 1;
-                    for (int i = 13; i < data.Length - 1; i += 2)
+
+                    if (double.Parse(rcst.FirmwareVer.Substring(2)) < 0.10d)
                     {
-                        Data dt = new Data();
-                        dt.Serial = Serial;
-                        delta1 = Delta(data[i]);
-                        delta2 = Delta(data[i + 1]);
-                        dt.Data1 = data1 + delta1;
-                        dt.Data2 = data2 + delta2;
-                        
-                        dt.Time = startTime.AddSeconds(j * interval);
-                        datalist.Add(dt);
-                        data1 = dt.Data1;
-                        data2 = dt.Data2;
-                        //startTime = dt.Time;
-                        j++;
-                    }
-                   
-                    int lastIndex = datalist.Count - 1;
-                    
-                          
-                    if (db.Data1.Any(d=>d.Serial==Serial))
-                    {
-                        Data newestData = db.Data1.OrderByDescending(u => u.ID).Where(u => u.Serial == Serial).FirstOrDefault();
-                       // Console.WriteLine("Time in DB: " + newestData.Time.ToString());
-                        if (newestData.Time== datalist[lastIndex].Time)
+                        if (rcst.ContinueMem)
                         {
-                            //the record already exist in DB
-                            return;
+                            rcst.ContinueMemoryCount = (short)(db.Data1.Where(u => u.Serial == Serial).ToList().Count / numOfDt);
+                        }
+                        package = data[7] + data[8] * 256;//number of the package
+                        double data1 = convertTemFrom15bit((data[9] + data[10] * 256), 10);
+                        double data2 = convertTemFrom15bit((data[11] + data[12] * 256), 10);
+                        double delta1 = 0, delta2 = 0;
+                        DateTime startTime = DateTime.Parse(rcst.Starttime);
+                        //first data of packet
+                        Data dtFirt = new Data();
+                        dtFirt.Serial = Serial;
+                        dtFirt.Data1 = data1;
+                        dtFirt.Data2 = data2;
+                        startTime = startTime.AddSeconds((rcst.ContinueMemoryCount * numOfDt + dataPerPacket * package) * interval);
+                        //Console.WriteLine("a Packet: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime + ", Continue Mem Count: " + rcst.ContinueMemoryCount);
+                        string mesLog = Serial + "," + startTime.ToString() + "," + "D0" + "," + rcst.ContinueMemoryCount + "," + package + "," + data1 + "," + data2;
+                        Utilities.WriteLogDebug(mesLog);
+                        dtFirt.Time = startTime;
+                        datalist.Add(dtFirt);
+                        int j = 1;
+                        for (int i = 13; i < data.Length - 1; i += 2)
+                        {
+                            Data dt = new Data();
+                            dt.Serial = Serial;
+                            delta1 = Delta(data[i]);
+                            delta2 = Delta(data[i + 1]);
+                            dt.Data1 = data1 + delta1;
+                            dt.Data2 = data2 + delta2;
+                            dt.Time = startTime.AddSeconds(j * interval);
+                            datalist.Add(dt);
+                            data1 = dt.Data1;
+                            data2 = dt.Data2;
+                            //startTime = dt.Time;
+                            j++;
                         }
                     }
+                    else
+                    {
+                        package = data[7] + (data[8] << 8) + (data[9] << 16) + (data[10] << 24);//number of the package
+                        double data1 = convertTemFrom15bit((data[11] + data[12] * 256), 10);
+                        double data2 = convertTemFrom15bit((data[13] + data[14] * 256), 10);
+                        double delta1 = 0, delta2 = 0;
+                        DateTime startTime = DateTime.Parse(rcst.Starttime);
+                        //first data of packet
+                        Data dtFirt = new Data();
+                        dtFirt.Serial = Serial;
+                        dtFirt.Data1 = data1;
+                        dtFirt.Data2 = data2;
+                        startTime = startTime.AddSeconds((dataPerPacket * package) * interval);
+                       // Console.WriteLine("D0: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime + ", Continue Mem Count: " + rcst.ContinueMemoryCount);
+                        string mesLog = Serial + "," + startTime.ToString() + "," + "D0" + "," + rcst.ContinueMemoryCount + "," + package + "," + data1 + "," + data2;
+                        Utilities.WriteLogDebug(mesLog);
+                        dtFirt.Time = startTime;
+                        datalist.Add(dtFirt);
+                        int j = 1;
+                        for (int i = 15; i < data.Length - 1; i += 2)
+                        {
+                            Data dt = new Data();
+                            dt.Serial = Serial;
+                            delta1 = Delta(data[i]);
+                            delta2 = Delta(data[i + 1]);
+                            dt.Data1 = data1 + delta1;
+                            dt.Data2 = data2 + delta2;
+                            dt.Time = startTime.AddSeconds(j * interval);
+                            datalist.Add(dt);
+                            data1 = dt.Data1;
+                            data2 = dt.Data2;
+                            //startTime = dt.Time;
+                            j++;
+                        }
+
+
+                    }
+
+
+                    int lastIndex = datalist.Count - 1;
                     //Console.WriteLine("last index: " + lastIndex + "Last time: " + datalist[lastIndex].Time.ToString());
                     //save Realtime Table
                     var record = db.Realtimes.Include(a => a.Setting).FirstOrDefault<Realtime>(u => u.Serial == Serial);
@@ -194,8 +232,13 @@ namespace UDPServerAndWebSocketClient
                     {
                         return;
                     }
-                   
-                    string runtime= (datalist[lastIndex].Time - DateTime.Parse(rcst.Starttime)).ToString();
+                    if (db.PacketD0.Any(p => p.Serial == Serial && p.Packet == package))
+                    {
+                        Console.WriteLine(DateTime.Now.ToString("dd-MMM hh:mm:ss") + ", " + Serial + ", D0: " + package + " Existing packet");
+                        return;
+                    }
+                    db.PacketD0.Add(new PacketD0() { Serial= Serial, Packet= package});
+                    string runtime = (datalist[lastIndex].Time - DateTime.Parse(rcst.Starttime)).ToString();
                     if (record != null) //update
                     {
                         string unit = record.Setting.Unit == "Celsius" ? "°C " : "°F";
@@ -218,10 +261,10 @@ namespace UDPServerAndWebSocketClient
                             TimeUpdated = datalist[lastIndex].Time.ToString("MMM d HH:mm:ss") + GetTimezoneUTC(Serial)
                         });
                     }
-                     
 
-                     db.Data1.AddRange(datalist);
-                     db.SaveChanges();
+
+                    db.Data1.AddRange(datalist);
+                    db.SaveChanges();
                 }
             }
             catch (Exception ex)
@@ -229,6 +272,11 @@ namespace UDPServerAndWebSocketClient
                 Utilities.WriteLogError(ex);
             }
         }
+        /// <summary>
+        /// Get Realtime and missData Packet 2
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="Serial"></param>
         public void GetRealtimeD1(byte[] data, string Serial)
         {
             try
@@ -240,57 +288,102 @@ namespace UDPServerAndWebSocketClient
                     {
                         return;
                     }
-                    var datalist = new List<Data>();
-                    int package = data[7] + data[8] * 256;//number of the package
-
                     int interval = rcst.IntervalSec + rcst.IntervalMin * 60 + rcst.IntervalHour * 3600;//Total second of interval time
                     int numOfDt = (rcst.DurationHour + rcst.DurationDay * 24) * 3600 / interval;//all data
 
-                    if (rcst.ContinueMem)
-                    {
-                        rcst.ContinueMemoryCount = (short)(db.Data1.Where(u => u.Serial == Serial).ToList().Count / numOfDt);
-                    }
 
                     int dataPerPacket = ((rcst.IntervalSendLoraMin + rcst.IntervalSendLoraHour * 60 + rcst.IntervalSendLoraDay * 24 * 60) * 60) / (interval);//num of data per package must sent to server
-                    double data1 = convertTemFrom15bit((data[9] + data[10] * 256), 10);
-                    double data2 = convertTemFrom15bit((data[11] + data[12] * 256), 10);
-
-                    double delta1 = 0, delta2 = 0;
-                    DateTime startTime = DateTime.Parse(rcst.Starttime);
-                    //first data of packet
-                    Data dtFirt = new Data();
-                    dtFirt.Serial = Serial;
-                    dtFirt.Data1 = data1;
-                    dtFirt.Data2 = data2;
-                    startTime = startTime.AddSeconds((rcst.ContinueMemoryCount * numOfDt + dataPerPacket * package  + 21) * interval);
-                    Console.WriteLine("Packet: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime);
-                    string mesLog = Serial+","+ startTime.ToString() + "," + "D1" + "," + rcst.ContinueMemoryCount + "," + package + "," + data1 + "," + data2;
-                    Utilities.WriteLogDebug(mesLog);
-                    dtFirt.Time = startTime;
-                    datalist.Add(dtFirt);
-                    int j = 1;
-                    for (int i = 13; i < data.Length-1; i += 2)
+                    var datalist = new List<Data>();
+                    int package = data[7] + data[8] * 256;//number of the package
+                    if (double.Parse(rcst.FirmwareVer.Substring(2)) < 0.10d)
                     {
-                        Data dt = new Data();
-                        dt.Serial = Serial;
-                        delta1 = Delta(data[i]);
-                        delta2 = Delta(data[i + 1]);
-                        dt.Data1 = data1 + delta1;
-                        dt.Data2 = data2 + delta2;
-
-                        dt.Time = startTime.AddSeconds(j * interval);
-                        datalist.Add(dt);
-                        data1 = dt.Data1;
-                        data2 = dt.Data2;
-                        j++;
-                        //startTime = dt.Time;
+                        double data1 = convertTemFrom15bit((data[9] + data[10] * 256), 10);
+                        double data2 = convertTemFrom15bit((data[11] + data[12] * 256), 10);
+                        if (rcst.ContinueMem)
+                        {
+                            rcst.ContinueMemoryCount = (short)(db.Data1.Where(u => u.Serial == Serial).ToList().Count / numOfDt);
+                        }
+                        double delta1 = 0, delta2 = 0;
+                        DateTime startTime = DateTime.Parse(rcst.Starttime);
+                        //first data of packet
+                        Data dtFirt = new Data();
+                        dtFirt.Serial = Serial;
+                        dtFirt.Data1 = data1;
+                        dtFirt.Data2 = data2;
+                        startTime = startTime.AddSeconds((rcst.ContinueMemoryCount * numOfDt + dataPerPacket * package + 21) * interval);
+                        //Console.WriteLine("Packet: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime);
+                       // Console.WriteLine("D1: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime + ", Continue Mem Count: " + rcst.ContinueMemoryCount);
+                        string mesLog = Serial + "," + startTime.ToString() + "," + "D1" + "," + rcst.ContinueMemoryCount + "," + package + "," + data1 + "," + data2;
+                        Utilities.WriteLogDebug(mesLog);
+                        dtFirt.Time = startTime;
+                        datalist.Add(dtFirt);
+                        int j = 1;
+                        for (int i = 13; i < data.Length - 1; i += 2)
+                        {
+                            Data dt = new Data();
+                            dt.Serial = Serial;
+                            delta1 = Delta(data[i]);
+                            delta2 = Delta(data[i + 1]);
+                            dt.Data1 = data1 + delta1;
+                            dt.Data2 = data2 + delta2;
+                            dt.Time = startTime.AddSeconds(j * interval);
+                            datalist.Add(dt);
+                            data1 = dt.Data1;
+                            data2 = dt.Data2;
+                            j++;
+                            //startTime = dt.Time;
+                        }
                     }
+                    else
+                    {
+                        package = data[7] + (data[8] << 8) + (data[9] << 16) + (data[10] << 24);
+                        double data1 = convertTemFrom15bit((data[11] + data[12] * 256), 10);
+                        double data2 = convertTemFrom15bit((data[13] + data[14] * 256), 10);
+
+                        double delta1 = 0, delta2 = 0;
+                        DateTime startTime = DateTime.Parse(rcst.Starttime);
+                        //first data of packet
+                        Data dtFirt = new Data();
+                        dtFirt.Serial = Serial;
+                        dtFirt.Data1 = data1;
+                        dtFirt.Data2 = data2;
+                        startTime = startTime.AddSeconds((dataPerPacket * package + 20) * interval);
+                        //Console.WriteLine("D1: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime + ", Continue Mem Count: " + rcst.ContinueMemoryCount);
+                        string mesLog = Serial + "," + startTime.ToString() + "," + "D1" + "," + rcst.ContinueMemoryCount + "," + package + "," + data1 + "," + data2;
+                        Utilities.WriteLogDebug(mesLog);
+                        dtFirt.Time = startTime;
+                        datalist.Add(dtFirt);
+                        int j = 1;
+                        for (int i = 15; i < data.Length - 1; i += 2)
+                        {
+                            Data dt = new Data();
+                            dt.Serial = Serial;
+                            delta1 = Delta(data[i]);
+                            delta2 = Delta(data[i + 1]);
+                            dt.Data1 = data1 + delta1;
+                            dt.Data2 = data2 + delta2;
+                            dt.Time = startTime.AddSeconds(j * interval);
+                            datalist.Add(dt);
+                            data1 = dt.Data1;
+                            data2 = dt.Data2;
+                            j++;
+                            //startTime = dt.Time;
+                        }
+                    }
+
+
                     //save Realtime Table
                     var recordRealtime = db.Realtimes.Include(a => a.Setting).FirstOrDefault<Realtime>(u => u.Serial == Serial);
                     if (datalist.Count < 1)
                     {
                         return;
                     }
+                    if (db.PacketD1.Any(p => p.Serial == Serial && p.Packet == package))
+                    {
+                        Console.WriteLine(DateTime.Now.ToString("dd-MMM hh:mm:ss") + ", " + Serial + ", D1: " + package + " Existing packet");
+                        return;
+                    }
+                    db.PacketD1.Add(new PacketD1() { Serial = Serial, Packet = package });
                     int lastIndex = datalist.Count - 1;
                     if (db.Data1.Any(d => d.Serial == Serial))
                     {
@@ -298,12 +391,12 @@ namespace UDPServerAndWebSocketClient
                         // Console.WriteLine("Time in DB: " + newestData.Time.ToString());
                         if (newestData.Time == datalist[lastIndex].Time)
                         {
-                           //already exist in DB
+                            //already exist in DB
                             return;
                         }
                     }
-                   // Console.WriteLine("last index: " + lastIndex + "Last time: " + datalist[lastIndex].Time);
-                    string runtime= (datalist[lastIndex].Time - DateTime.Parse(rcst.Starttime)).ToString();
+                    // Console.WriteLine("last index: " + lastIndex + "Last time: " + datalist[lastIndex].Time);
+                    string runtime = (datalist[lastIndex].Time - DateTime.Parse(rcst.Starttime)).ToString();
                     if (recordRealtime != null && datalist.Count > 0) //update
                     {
                         string unit = recordRealtime.Setting.Unit == "Celsius" ? "°C " : "°F";
@@ -336,12 +429,18 @@ namespace UDPServerAndWebSocketClient
             }
 
         }
+        /// <summary>
+        /// Get Realtime and missdata Paclet 3
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="Serial"></param>
         public void GetRealtimeD2(byte[] data, string Serial)
         {
             try
             {
                 using (var db = new Pexo63LorawanEntities())
                 {
+
                     var rcst = db.Settings.Where(s => s.Serial == Serial).FirstOrDefault<Setting>();
                     if (rcst == null)
                     {
@@ -349,58 +448,92 @@ namespace UDPServerAndWebSocketClient
                     }
                     var datalist = new List<Data>();
                     int package = data[7] + data[8] * 256;//number of the package
+
                     int interval = rcst.IntervalSec + rcst.IntervalMin * 60 + rcst.IntervalHour * 3600;//Total second of interval time
                     int numOfDt = (rcst.DurationHour + rcst.DurationDay * 24) * 3600 / interval;//all data
-                    if (rcst.ContinueMem)
-                    {
-                        rcst.ContinueMemoryCount = (short)(db.Data1.Where(u => u.Serial == Serial).ToList().Count / numOfDt);
-                    }
                     int dataPerPacket = ((rcst.IntervalSendLoraMin + rcst.IntervalSendLoraHour * 60 + rcst.IntervalSendLoraDay * 24 * 60) * 60) / (interval);//num of data per package must sent to server
-                    double data1 = convertTemFrom15bit((data[9] + data[10] * 256), 10);
-                    double data2 = convertTemFrom15bit((data[11] + data[12] * 256), 10);
-                    double delta1 = 0, delta2 = 0;
-                    DateTime startTime = DateTime.Parse(rcst.Starttime);
-                    //first data of packet
-                    Data dtFirt = new Data();
-                    dtFirt.Serial = Serial;
-                    dtFirt.Data1 = data1;
-                    dtFirt.Data2 = data2;
-                    startTime = startTime.AddSeconds((rcst.ContinueMemoryCount * numOfDt + dataPerPacket * package + 1 + 42) * interval);
-                    dtFirt.Time = startTime;
-                    datalist.Add(dtFirt);
-                    int j = 1;
-                    for (int i = 13; i < data.Length-1; i += 2)
+                    if (double.Parse(rcst.FirmwareVer.Substring(2)) < 0.10d)
                     {
-                        Data dt = new Data();
-                        dt.Serial = Serial;
-                        delta1 = Delta(data[i]);
-                        delta2 = Delta(data[i + 1]);
-                        dt.Data1 = data1 + delta1;
-                        dt.Data2 = data2 + delta2;
-
-                        dt.Time = startTime.AddSeconds(j * interval);
-                        j++;
-                        datalist.Add(dt);
-                        data1 = dt.Data1;
-                        data2 = dt.Data2;
-                        // startTime = dt.Time;
+                        if (rcst.ContinueMem)
+                        {
+                            rcst.ContinueMemoryCount = (short)(db.Data1.Where(u => u.Serial == Serial).ToList().Count / numOfDt);
+                        }
+                        double data1 = convertTemFrom15bit((data[9] + data[10] * 256), 10);
+                        double data2 = convertTemFrom15bit((data[11] + data[12] * 256), 10);
+                        double delta1 = 0, delta2 = 0;
+                        DateTime startTime = DateTime.Parse(rcst.Starttime);
+                        //first data of packet
+                        Data dtFirt = new Data();
+                        dtFirt.Serial = Serial;
+                        dtFirt.Data1 = data1;
+                        dtFirt.Data2 = data2;
+                        startTime = startTime.AddSeconds((rcst.ContinueMemoryCount * numOfDt + dataPerPacket * package + 42) * interval);
+                        dtFirt.Time = startTime;
+                        datalist.Add(dtFirt);
+                        int j = 1;
+                        for (int i = 13; i < data.Length - 1; i += 2)
+                        {
+                            Data dt = new Data();
+                            dt.Serial = Serial;
+                            delta1 = Delta(data[i]);
+                            delta2 = Delta(data[i + 1]);
+                            dt.Data1 = data1 + delta1;
+                            dt.Data2 = data2 + delta2;
+                            dt.Time = startTime.AddSeconds(j * interval);
+                            j++;
+                            datalist.Add(dt);
+                            data1 = dt.Data1;
+                            data2 = dt.Data2;
+                            // startTime = dt.Time;
+                        }
                     }
+                    else
+                    {
+                        package = data[7] + (data[8] << 8) + (data[9] << 16) + (data[10] << 24);
+                        double data1 = convertTemFrom15bit((data[11] + data[12] * 256), 10);
+                        double data2 = convertTemFrom15bit((data[13] + data[14] * 256), 10);
+                        double delta1 = 0, delta2 = 0;
+                        DateTime startTime = DateTime.Parse(rcst.Starttime);
+                        //first data of packet
+                        Data dtFirt = new Data();
+                        dtFirt.Serial = Serial;
+                        dtFirt.Data1 = data1;
+                        dtFirt.Data2 = data2;
+                        startTime = startTime.AddSeconds((dataPerPacket * package + 40) * interval);
+                        dtFirt.Time = startTime;
+                        datalist.Add(dtFirt);
+                        int j = 1;
+                        for (int i = 15; i < data.Length - 1; i += 2)
+                        {
+                            Data dt = new Data();
+                            dt.Serial = Serial;
+                            delta1 = Delta(data[i]);
+                            delta2 = Delta(data[i + 1]);
+                            dt.Data1 = data1 + delta1;
+                            dt.Data2 = data2 + delta2;
+                            dt.Time = startTime.AddSeconds(j * interval);
+                            j++;
+                            datalist.Add(dt);
+                            data1 = dt.Data1;
+                            data2 = dt.Data2;
+                            // startTime = dt.Time;
+                        }
+                    }
+
                     //save Realtime Table
                     var record = db.Realtimes.Include(a => a.Setting).FirstOrDefault<Realtime>(u => u.Serial == Serial);
                     if (datalist.Count < 1)
                     {
                         return;
                     }
-                    int lastIndex = datalist.Count - 1;
-                    if (db.Data1.Any(d => d.Serial == Serial))
+                    if (db.PacketD2.Any(p => p.Serial == Serial && p.Packet == package))
                     {
-                        Data newestData = db.Data1.OrderByDescending(u => u.ID).Where(u => u.Serial == Serial).FirstOrDefault();
-                        if (newestData.Time == datalist[lastIndex].Time)
-                        {
-                            //if record already exist in the DB
-                            return;
-                        }
+                        Console.WriteLine(DateTime.Now.ToString("dd-MMM hh:mm:ss") + ", " + Serial + ", D2: " + package + " Existing packet");
+                        return;
                     }
+                    db.PacketD2.Add(new PacketD2() { Serial = Serial, Packet = package });
+                    int lastIndex = datalist.Count - 1;
+
                     string runtime = (datalist[lastIndex].Time - DateTime.Parse(rcst.Starttime)).ToString();
                     if (record != null && datalist.Count > 0) //update
                     {
@@ -433,6 +566,11 @@ namespace UDPServerAndWebSocketClient
             }
 
         }
+        /// <summary>
+        /// get alarm data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="Serial"></param>
         public void GetAlarmData(byte[] data, string Serial)
         {
             try
@@ -645,6 +783,10 @@ namespace UDPServerAndWebSocketClient
         public void GetSeting2(byte[] data, string Serial)
         {
             //Get timezone 40byte
+            if (setting==null)
+            {
+                return;
+            }
             string timezone = Encoding.ASCII.GetString(data, 9, 40).Replace("\0", "").Trim();
             System.Collections.ObjectModel.ReadOnlyCollection<TimeZoneInfo> zones = TimeZoneInfo.GetSystemTimeZones();
             foreach (TimeZoneInfo zone in zones)
@@ -660,10 +802,18 @@ namespace UDPServerAndWebSocketClient
                 setting.TimezoneId = TimeZoneInfo.Local.Id;
             }
 
-            Console.WriteLine("Timezone ID: " + setting.TimezoneId);
+            //Console.WriteLine("Timezone ID: " + setting.TimezoneId);
         }
         public void GetSeting3(byte[] data, string Serial)
         {
+            if (setting==null)//Check this if not receive packet Setting 1
+            {
+                return;
+            }
+            if (alarmSet==null) //Check this if not receive packet Setting 1
+            {
+                return;
+            }
             //Get Description
             setting.Description = Encoding.ASCII.GetString(data, 9, 20).Replace("\0", "");
             setting.IntervalSendLoraMin = data[31];
@@ -680,6 +830,22 @@ namespace UDPServerAndWebSocketClient
                 {
                     db.Data1.RemoveRange(itemDelete);
                 }
+                //delete packet table
+                var packetTb1 = db.PacketD0.Where(p => p.Serial == Serial);
+                var packetTb2 = db.PacketD1.Where(p => p.Serial == Serial);
+                var packetTb3 = db.PacketD2.Where(p => p.Serial == Serial);
+                if (packetTb1!=null)
+                {
+                    db.PacketD0.RemoveRange(packetTb1);
+                }
+                if (packetTb2 != null)
+                {
+                    db.PacketD1.RemoveRange(packetTb2);
+                }
+                if (packetTb3 != null)
+                {
+                    db.PacketD2.RemoveRange(packetTb3);
+                }
 
                 if (record == null) //not exis
                 {
@@ -691,7 +857,7 @@ namespace UDPServerAndWebSocketClient
 
 
                     //Cap nhat
-                   
+
                     record.Description = setting.Description;
                     record.DurationDay = setting.DurationDay;
                     record.DurationHour = setting.DurationHour;
@@ -774,6 +940,8 @@ namespace UDPServerAndWebSocketClient
                 {
                     Utilities.WriteLogError(ex);
                 }
+                setting = null;
+                alarmSet = null;
             }
 
         }

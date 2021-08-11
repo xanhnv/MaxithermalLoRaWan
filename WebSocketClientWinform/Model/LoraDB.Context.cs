@@ -31,5 +31,8 @@ namespace UDPServerAndWebSocketClient.Model
         public virtual DbSet<Setting> Settings { get; set; }
         public virtual DbSet<Device> Devices { get; set; }
         public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
+        public virtual DbSet<PacketD0> PacketD0 { get; set; }
+        public virtual DbSet<PacketD1> PacketD1 { get; set; }
+        public virtual DbSet<PacketD2> PacketD2 { get; set; }
     }
 }

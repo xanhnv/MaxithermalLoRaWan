@@ -39,6 +39,30 @@
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="DeviceAddress" Type="varbinary(max)" Nullable="false" />
         </EntityType>
+        <EntityType Name="PacketD0">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Serial" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Packet" Type="bigint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PacketD1">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Serial" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Packet" Type="bigint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PacketD2">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Serial" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Packet" Type="bigint" Nullable="false" />
+        </EntityType>
         <EntityType Name="Realtime">
           <Key>
             <PropertyRef Name="Serial" />
@@ -131,6 +155,9 @@
           <EntitySet Name="Alarm" EntityType="Self.Alarm" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Data" EntityType="Self.Data" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Device" EntityType="Self.Device" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PacketD0" EntityType="Self.PacketD0" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PacketD1" EntityType="Self.PacketD1" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PacketD2" EntityType="Self.PacketD2" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Realtime" EntityType="Self.Realtime" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Settings" EntityType="Self.Settings" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
@@ -193,6 +220,9 @@
           </AssociationSet>
           <EntitySet Name="Devices" EntityType="Pexo63LorawanModel.Device" />
           <EntitySet Name="sysdiagrams" EntityType="Pexo63LorawanModel.sysdiagram" />
+          <EntitySet Name="PacketD0" EntityType="Pexo63LorawanModel.PacketD0" />
+          <EntitySet Name="PacketD1" EntityType="Pexo63LorawanModel.PacketD1" />
+          <EntitySet Name="PacketD2" EntityType="Pexo63LorawanModel.PacketD2" />
           </EntityContainer>
         <EntityType Name="Alarm">
           <Key>
@@ -299,7 +329,31 @@
           <Property Name="version" Type="Int32" />
           <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
-      </Schema>
+        <EntityType Name="PacketD0">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Serial" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Packet" Type="Int64" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PacketD1">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Serial" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Packet" Type="Int64" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PacketD2">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Serial" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Packet" Type="Int64" Nullable="false" />
+        </EntityType>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -397,7 +451,34 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-        </EntityContainerMapping>
+          <EntitySetMapping Name="PacketD0">
+            <EntityTypeMapping TypeName="Pexo63LorawanModel.PacketD0">
+              <MappingFragment StoreEntitySet="PacketD0">
+                <ScalarProperty Name="Packet" ColumnName="Packet" />
+                <ScalarProperty Name="Serial" ColumnName="Serial" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PacketD1">
+            <EntityTypeMapping TypeName="Pexo63LorawanModel.PacketD1">
+              <MappingFragment StoreEntitySet="PacketD1">
+                <ScalarProperty Name="Packet" ColumnName="Packet" />
+                <ScalarProperty Name="Serial" ColumnName="Serial" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PacketD2">
+            <EntityTypeMapping TypeName="Pexo63LorawanModel.PacketD2">
+              <MappingFragment StoreEntitySet="PacketD2">
+                <ScalarProperty Name="Packet" ColumnName="Packet" />
+                <ScalarProperty Name="Serial" ColumnName="Serial" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
   </edmx:Runtime>
