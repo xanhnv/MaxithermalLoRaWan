@@ -46,7 +46,7 @@ namespace UDPServerAndWebSocketClient
             this.form1 = form1;
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             aTimer.Interval = 1000 * 60;//1 minute
-            aTimer.Enabled = true;
+            aTimer.Enabled = false;//kiểm tra sau
         }
         UDPSocket()
         {
@@ -274,7 +274,7 @@ namespace UDPServerAndWebSocketClient
                 //processing data
                 string receive = Encoding.ASCII.GetString(byteData, 0, bytes).Replace("\0", "");
                 string rec = "RECV: " + epSender.ToString() + " , " + bytes + " , " + receive + " \r\n";
-                Console.WriteLine(rec);
+                //Console.WriteLine(rec);
                 if (bytes > 50)
                 {
                     try
@@ -316,10 +316,12 @@ namespace UDPServerAndWebSocketClient
                                         string serialno = (dataReceive[4] * Math.Pow(2, 16) + dataReceive[3] * Math.Pow(2, 8) + dataReceive[2]).ToString("00000");
                                         string serialNumber = (char)(dataReceive[5]) + dataReceive[1].ToString("00") + dataReceive[0].ToString("00") + serialno;
                                         string packetType = Encoding.ASCII.GetString(dataReceive, 6, 2);
-                                        Console.WriteLine("Serial: " + serialNumber + " packetType: " + packetType);
+                                        int package = dataReceive[7] + (dataReceive[8] << 8) + (dataReceive[9] << 16) + (dataReceive[10] << 24);
+                                        Console.WriteLine(DateTime.Now.ToString("dd/MMM/yy HH:mm:ss") + ", " + "Serial: " + serialNumber + ", packetType: " + dataReceive[6].ToString("X") + ":" + dataReceive[7].ToString("X") +
+                                            ", Packetnumber: " + package);
 
                                         //Utilities.WriteLog("S/N: " + serialNumber + " Type: " + packetType + "Data: " + Helper.ToHexString(dataReceive));
-                                        Utilities.WriteLogPackType(DateTime.Now.ToString("g") + ", " + serialNumber + "," +dataReceive[6].ToString("X")+dataReceive[7].ToString("X") + "," + Helper.ToHexString(dataReceive));
+                                        Utilities.WriteLogPackType(DateTime.Now.ToString("g") + ", " + serialNumber + "," +dataReceive[6].ToString("X")+dataReceive[7].ToString("X") + "," +package +"," + Helper.ToHexString(dataReceive));
 
                                         if (dataReceive[6] == 0xd0 || dataReceive[6] == 0xa0)
                                         {
@@ -359,22 +361,30 @@ namespace UDPServerAndWebSocketClient
                                         {
                                             case "A0":
                                             case "D0"://Realtime data
-                                                dataProcessing.GetRealtimeD0(dataReceive, serialNumber);//
-                                                //new Thread(() =>
-                                                //{
-                                                //    dataProcessing.GetRealtimeD0(dataReceive, serialNumber);
-                                                //}
-                                                //).Start();
+                                                //check if packet already received
+                                                
+
+                                                //dataProcessing.GetRealtimeD0(dataReceive, serialNumber);//
+                                                new Thread(() =>
+                                                {
+                                                    dataProcessing.GetRealtimeD0(dataReceive, serialNumber);
+                                                    //save packet to packets table
+                                                }
+                                                ).Start();
+
                                                 break;
                                             case "A1":
                                             case "D1":
-                                                //new Thread(() => { dataProcessing.GetRealtimeD1(dataReceive, serialNumber); });
-                                                dataProcessing.GetRealtimeD1(dataReceive, serialNumber);//
+                                                new Thread(() =>
+                                                {
+                                                    dataProcessing.GetRealtimeD1(dataReceive, serialNumber);
+                                                }).Start();
+                                                //dataProcessing.GetRealtimeD1(dataReceive, serialNumber);//
                                                 break;
                                             case "A2":
                                             case "D2":
-                                               // new Thread(()=> { dataProcessing.GetRealtimeD2(dataReceive, serialNumber); });
-                                                dataProcessing.GetRealtimeD2(dataReceive, serialNumber);//
+                                               new Thread(()=> { dataProcessing.GetRealtimeD2(dataReceive, serialNumber); }).Start();
+                                                //dataProcessing.GetRealtimeD2(dataReceive, serialNumber);//
                                                 break;
 
                                             case "S1": //Setting 1
@@ -510,7 +520,7 @@ namespace UDPServerAndWebSocketClient
                 serverSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, epSender,
                             new AsyncCallback(OnSend), epSender);
 
-                 Console.WriteLine("SEND: {0}, {1}", text, "IP: " + epSender.ToString());
+                 //Console.WriteLine("SEND: {0}, {1}", text, "IP: " + epSender.ToString());
             }
             catch (Exception ex)
             {
