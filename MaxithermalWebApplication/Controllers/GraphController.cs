@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using System.Data.Entity;
 using Microsoft.Reporting.WebForms;
 using System.IO;
+using System.Text;
 
 namespace MaxithermalWebApplication.Controllers
 {
@@ -37,20 +38,23 @@ namespace MaxithermalWebApplication.Controllers
 
             var data1 = db.Data1
                             .Where(u => u.Serial == id)
+                            .OrderByDescending(u => u.Time)
+                            .Take(60000)
                             .OrderBy(u => u.Time)
-                            .Take(66000)
                             .Select(u => u.Data1)
                             .ToList();
             var data2 = db.Data1
-                            .Where(u => u.Serial == id)
-                             .OrderBy(u => u.Time)
-                              .Take(66000)
+                            .Where(u => u.Serial == id)                            
+                            .OrderByDescending(u => u.Time)
+                            .Take(60000)
+                            .OrderBy(u => u.Time)
                             .Select(u => u.Data2)
                             .ToList();
             var date = db.Data1
                             .Where(u => u.Serial == id)
+                             .OrderByDescending(u => u.Time)
+                             .Take(60000)
                              .OrderBy(u => u.Time)
-                             .Take(66000)
                             .Select(u => u.Time)
                             .ToList();
             //var Data1 = db.Data1
@@ -109,7 +113,7 @@ namespace MaxithermalWebApplication.Controllers
             reportDataSource.Name = "AllData";
             reportDataSource.Value = db.Data1
                                               .Where(u => u.Serial == id)
-                                              .OrderBy(x => x.ID)
+                                              .OrderBy(x => x.Time)
                                               .ToList();
 
             localReport.DataSources.Add(reportDataSource);
@@ -229,6 +233,22 @@ namespace MaxithermalWebApplication.Controllers
             bw.Write(data);
             bw.Close();
             return View();
+        }
+
+        public ActionResult ExportCSV(string id)
+        {
+            var lstStudents = db.Data1.Where(u => u.Serial == id)
+                                     .OrderBy(x => x.Time)
+                                     .ToList();
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in lstStudents)
+            {
+                //Append data with comma(,) separator.
+                sb.Append(item.Time.ToString() + ',' + item.Data1 + "," + item.Data2);
+                //Append new line character.
+                sb.Append("\r\n");
+            }
+            return File(Encoding.ASCII.GetBytes(sb.ToString()), "text/csv", id + ".csv");
         }
     }
 }

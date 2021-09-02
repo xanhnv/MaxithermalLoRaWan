@@ -33,7 +33,7 @@
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            @*<li><a href="#">Export to Excel</a></li>*@
+                            <li><@Html.ActionLink("Export to CSV", "ExportCSV", new {id= ViewBag.ID },"")></li>
                             <li> @Html.ActionLink("Export to Excel", "Export", new { Type = "EXCEL", id = ViewBag.ID }, "")</li>
                             <li> @Html.ActionLink("Export to Word", "Export", new { Type = "WORD", id = ViewBag.ID }, "")</li>
                             <li> @Html.ActionLink("Export to PDF", "Export", new { Type = "PDF", id = ViewBag.ID }, "")</li>

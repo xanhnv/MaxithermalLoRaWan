@@ -299,6 +299,8 @@ namespace UDPServerAndWebSocketClient
                                 {
                                     string frmPayloadStr = "MACAdd: " + Helper.ToHexString(devAdd);
                                     frmPayloadStr += "  FRMPayload: " + m.GetFRMPayLoadDecryptedString();
+                                    counterUp = m.FHDR.FCnt[0] * 256 + m.FHDR.FCnt[1];
+                                        
                                     //Console.WriteLine(frmPayloadStr);
                                     if (m.GetFRMPayLoadDecryptedString() != frmPayloadOld)
                                     {
@@ -316,12 +318,12 @@ namespace UDPServerAndWebSocketClient
                                         string serialno = (dataReceive[4] * Math.Pow(2, 16) + dataReceive[3] * Math.Pow(2, 8) + dataReceive[2]).ToString("00000");
                                         string serialNumber = (char)(dataReceive[5]) + dataReceive[1].ToString("00") + dataReceive[0].ToString("00") + serialno;
                                         string packetType = Encoding.ASCII.GetString(dataReceive, 6, 2);
-                                        int package = dataReceive[7] + (dataReceive[8] << 8) + (dataReceive[9] << 16) + (dataReceive[10] << 24);
+                                        int package = dataReceive[7] + (dataReceive[8] << 8) + (dataReceive[9] << 16);
                                         Console.WriteLine(DateTime.Now.ToString("dd/MMM/yy HH:mm:ss") + ", " + "Serial: " + serialNumber + ", packetType: " + dataReceive[6].ToString("X") + ":" + dataReceive[7].ToString("X") +
-                                            ", Packetnumber: " + package);
+                                           ", DataPerPacket= "+ dataReceive[10]+ ", Packetnumber: " + package);
 
                                         //Utilities.WriteLog("S/N: " + serialNumber + " Type: " + packetType + "Data: " + Helper.ToHexString(dataReceive));
-                                        Utilities.WriteLogPackType(DateTime.Now.ToString("g") + ", " + serialNumber + "," +dataReceive[6].ToString("X")+dataReceive[7].ToString("X") + "," +package +"," + Helper.ToHexString(dataReceive));
+                                        Utilities.WriteLogPackType(DateTime.Now.ToString("g") + ", " + serialNumber + "," +dataReceive[6].ToString("X")+dataReceive[7].ToString("X") + "," +package +"," +dataReceive[10] +","+ Helper.ToHexString(dataReceive));
 
                                         if (dataReceive[6] == 0xd0 || dataReceive[6] == 0xa0)
                                         {
@@ -342,6 +344,11 @@ namespace UDPServerAndWebSocketClient
                                         {
                                             payload = GetDataSetting(serialNumber, packetType);
                                         }
+                                        //string testEendFromServer = "EN" ;
+                                        //if (serialNumber== "N220080055")
+                                        //{
+                                        //    payload = Encoding.ASCII.GetBytes(testEendFromServer);
+                                        //}
 
                                         //Console.WriteLine("seting length:" + payload.Length);
                                         var frmPayload = encrypt.encrypt(payload, appKey, devAdd, counterUp);
@@ -352,10 +359,10 @@ namespace UDPServerAndWebSocketClient
                                         dataSend.AddRange(MacPayload);//Add mac payload
                                         dataSend.AddRange(MIC); //Add mic
                                         string dataStr = Convert.ToBase64String(dataSend.ToArray());
-                                        Thread.Sleep(100);
+                                        //Thread.Sleep(100);
                                         Txpk txpk = new Txpk(false, double.Parse(timeStamp.ToString()) + 2000000, 923.3, 0, 27, "LORA", "SF9BW125", "4/5", true, payload.Length + 13, true, dataStr);
                                         string json_down = " {\"txpk\":" + JsonConvert.SerializeObject(txpk) + "}";
-                                        Send2(json_down);
+                                        SendAsyn(json_down);
                                         //processcing data
                                         switch (packetType)
                                         {
@@ -363,7 +370,6 @@ namespace UDPServerAndWebSocketClient
                                             case "D0"://Realtime data
                                                 //check if packet already received
                                                 
-
                                                 //dataProcessing.GetRealtimeD0(dataReceive, serialNumber);//
                                                 new Thread(() =>
                                                 {
@@ -413,7 +419,6 @@ namespace UDPServerAndWebSocketClient
                                         }
                                         frmPayloadOld = serialNumber;
                                         form1.RefreshGridView();
-                                       
 
                                     }
                                 }
@@ -443,6 +448,27 @@ namespace UDPServerAndWebSocketClient
             {
                 MessageBox.Show(ex.Message, "ServerUDP", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+        async Task SendAsyn(string text)
+        {
+            await Task.Run(() =>
+            {
+                try
+                {
+                    //Send the message to user
+                    Thread.Sleep(500);
+                    byte[] data = Encoding.ASCII.GetBytes(text);
+                    serverSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, epSender,
+                                new AsyncCallback(OnSend), epSender);
+
+                    Console.WriteLine("SEND: {0}, {1}", text, "IP: " + epSender.ToString());
+                }
+                catch (Exception ex)
+                {
+                    Utilities.WriteLogError(ex);
+                }
+            });
+
         }
         void SendTestACK(EncryptData encrypt, byte[]devAdd, double timeStamp )
         {
@@ -520,7 +546,7 @@ namespace UDPServerAndWebSocketClient
                 serverSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, epSender,
                             new AsyncCallback(OnSend), epSender);
 
-                 //Console.WriteLine("SEND: {0}, {1}", text, "IP: " + epSender.ToString());
+                 Console.WriteLine("SEND: {0}, {1}", text, "IP: " + epSender.ToString());
             }
             catch (Exception ex)
             {

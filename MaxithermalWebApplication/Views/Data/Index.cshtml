@@ -11,10 +11,11 @@
 
 
 <h4>All Data of  Logger: <b>@ViewBag.ID </b>@ViewBag.Timezone</h4>
+@Html.ActionLink("Export to CSV", "ExportCSV", "Graph", new {id= ViewBag.ID },"")|
 @Html.ActionLink("Export to Excel", "Reports", new { ReportType = "Excel", id = @ViewBag.ID })  |
 @Html.ActionLink("Export to WORD", "Reports", new { ReportType = "Word", id = @ViewBag.ID })  |
 @Html.ActionLink("Export to PDF", "Reports", new { ReportType = "Pdf", id = @ViewBag.ID })  |
-@Html.ActionLink("Show Graph", "index", "Graph", new { id=@ViewBag.ID}, "")
+@Html.ActionLink("Show Graph", "index", "Graph", new { id = @ViewBag.ID }, "")
 @{
     string title1 = "Data C1", title2 = "Data C2";
     switch ((byte)ViewBag.devType)
@@ -110,7 +111,7 @@ Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageC
     var lastRecordID= @ViewBag.lastRecordID
     function GetNewestData()
     {
-        
+
         $.ajax({
             type: "POST",
             url: "/Data/NewestData/@ViewBag.ID",
