@@ -12,7 +12,7 @@ namespace UDPServerAndWebSocketClient.Model
     using System;
     using System.Collections.Generic;
     
-    public partial class Data
+    public partial class Datum
     {
         public int ID { get; set; }
         public string Serial { get; set; }

@@ -4,20 +4,19 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="633ce4a4bb2c44deabec5cb3e7fc956e" Name="Diagram1" ZoomLevel="71">
-        <EntityTypeShape EntityType="Pexo63LorawanModel.Data" Width="1.5" PointX="3" PointY="4.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="Pexo63LorawanModel.Realtime" Width="1.5" PointX="3" PointY="7.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="Pexo63LorawanModel.Alarm" Width="1.5" PointX="11.125" PointY="3.625" />
-        <EntityTypeShape EntityType="Pexo63LorawanModel.Setting" Width="2.125" PointX="6.875" PointY="3.125" />
-        <AssociationConnector Association="Pexo63LorawanModel.FK_Alarm_Settings" />
-        <AssociationConnector Association="Pexo63LorawanModel.FK_Data_Settings" />
-        <AssociationConnector Association="Pexo63LorawanModel.FK_Realtime_Settings" />
-        <EntityTypeShape EntityType="Pexo63LorawanModel.Device" Width="1.5" PointX="0.75" PointY="0.75" />
-        <EntityTypeShape EntityType="Pexo63LorawanModel.sysdiagram" Width="1.5" PointX="2.75" PointY="0.75" />
-        <EntityTypeShape EntityType="Pexo63LorawanModel.PacketD0" Width="1.5" PointX="5.375" PointY="0.75" />
-        <EntityTypeShape EntityType="Pexo63LorawanModel.PacketD1" Width="1.5" PointX="7.375" PointY="0.75" />
-        <EntityTypeShape EntityType="Pexo63LorawanModel.PacketD2" Width="1.5" PointX="9.375" PointY="0.75" />
-        </Diagram>
+      <Diagram DiagramId="67e9eb2ea1794c779309a95d89682ff4" Name="Diagram1">
+        <EntityTypeShape EntityType="Pexo63LorawanModel.Alarm" Width="1.5" PointX="3" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.Datum" Width="1.5" PointX="3" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.Device" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.PacketD0" Width="1.5" PointX="5.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.PacketD1" Width="1.5" PointX="5.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.PacketD2" Width="1.5" PointX="7.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.Realtime" Width="1.5" PointX="3" PointY="8.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="Pexo63LorawanModel.Setting" Width="1.5" PointX="0.75" PointY="2.875" IsExpanded="true" />
+        <AssociationConnector Association="Pexo63LorawanModel.FK_Alarm_Settings" ManuallyRouted="false" />
+        <AssociationConnector Association="Pexo63LorawanModel.FK_Data_Settings" ManuallyRouted="false" />
+        <AssociationConnector Association="Pexo63LorawanModel.FK_Realtime_Settings" ManuallyRouted="false" />
+      </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
 </edmx:Edmx>

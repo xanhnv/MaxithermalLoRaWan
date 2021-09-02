@@ -64,7 +64,7 @@ namespace UDPServerAndWebSocketClient
                     if (item.Status == "running")
                     {
                         //get last data record
-                        var lastDataRec = db.Data1.OrderByDescending(p => p.Time).FirstOrDefault(dt => dt.Serial == item.Serial);
+                        var lastDataRec = db.Data.OrderByDescending(p => p.Time).FirstOrDefault(dt => dt.Serial == item.Serial);
                         if (lastDataRec != null)
                         {
                             //get timezone in Logger
