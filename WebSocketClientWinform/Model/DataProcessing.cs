@@ -115,7 +115,7 @@ namespace UDPServerAndWebSocketClient
         {
             // Unix timestamp is seconds past epoch
             DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            dateTime = dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            dateTime = dateTime.AddSeconds(unixTimeStamp);
             return dateTime;
         }
         public double Delta(byte data)
@@ -204,14 +204,14 @@ namespace UDPServerAndWebSocketClient
                         dtFirt.Serial = Serial;
                         dtFirt.Data1 = data1;
                         dtFirt.Data2 = data2;
-                        startTimePacket = startTimePacket.AddSeconds((dataPerPacket * package) * interval);
+                        //startTimePacket = startTimePacket.AddSeconds((dataPerPacket * package) * interval);
                         // Console.WriteLine("D0: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime + ", Continue Mem Count: " + rcst.ContinueMemoryCount);
                         string mesLog = Serial + "," + startTimePacket.ToString() + "," + "D0" + "," + rcst.ContinueMemoryCount + "," + package + "," + data1 + "," + data2;
                         Utilities.WriteLogDebug(mesLog);
                         dtFirt.Time = startTimePacket;
                         datalist.Add(dtFirt);
                         int j = 1;
-                        for (int i = 16; i < 16 + data[11] * 2; i += 2)
+                        for (int i = 16; i < 16 + (data[11]-1) * 2; i += 2)
                         {
                             Datum dt = new Datum();
                             dt.Serial = Serial;
