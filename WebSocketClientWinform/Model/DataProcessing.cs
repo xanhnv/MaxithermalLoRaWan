@@ -111,10 +111,10 @@ namespace UDPServerAndWebSocketClient
                 return (num / coefficient);
             return ((num - 32768D) / coefficient);
         }
-        public DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        public DateTime UnixTimeStampToDateTime(double unixTimeStamp, DateTime dateTime)
         {
             // Unix timestamp is seconds past epoch
-            DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            //DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             dateTime = dateTime.AddSeconds(unixTimeStamp);
             return dateTime;
         }
@@ -193,12 +193,15 @@ namespace UDPServerAndWebSocketClient
                     }
                     else
                     {
-                        package = data[7] + (data[8] << 8) + (data[9] << 16) + (data[10] << 24);//in version 1.12 packet replaced = unix time 
-
+                        int packetAndNumOfMeas = data[7] + (data[8] << 8) + (data[9] << 16) + (data[10] << 24);//in version 1.12 packet replaced = unix time 
+                        //packet= time stamp (second)
+                        package = packetAndNumOfMeas & 0x7FFFFFF;
+                        int numberOfMeas = packetAndNumOfMeas >> 27;
                         double data1 = convertTemFrom15bit((data[12] + data[13] * 256), 10);
                         double data2 = convertTemFrom15bit((data[14] + data[15] * 256), 10);
                         double delta1 = 0, delta2 = 0;
-                        DateTime startTimePacket = UnixTimeStampToDateTime(package);
+                        DateTime startTime = DateTime.Parse(rcst.Starttime);
+                        DateTime startTimePacket = UnixTimeStampToDateTime(package, startTime);
                         //first data of packet
                         Datum dtFirt = new Datum();
                         dtFirt.Serial = Serial;
@@ -346,7 +349,7 @@ namespace UDPServerAndWebSocketClient
                         double data2 = convertTemFrom15bit((data[13] + data[14] * 256), 10);
 
                         double delta1 = 0, delta2 = 0;
-                        DateTime startTime = UnixTimeStampToDateTime(package);
+                        DateTime startTime = DateTime.Parse(rcst.Starttime);
                         //first data of packet
                         Datum dtFirt = new Datum();
                         dtFirt.Serial = Serial;
