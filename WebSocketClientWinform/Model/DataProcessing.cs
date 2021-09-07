@@ -214,22 +214,75 @@ namespace UDPServerAndWebSocketClient
                         dtFirt.Time = startTimePacket;
                         datalist.Add(dtFirt);
                         int j = 1;
-                        for (int i = 15; i < 15 + (numberOfMeas-1) * 2; i += 2)
+                        if (numberOfMeas<3)
                         {
-                            Datum dt = new Datum();
-                            dt.Serial = Serial;
+                            for (int i = 15; i < 15 + (numberOfMeas - 1) * 2; i += 2)
+                            {
+                                Datum dt = new Datum();
+                                dt.Serial = Serial;
 
-                            delta1 = Delta(data[i]);
-                            delta2 = Delta(data[i + 1]);
-                            dt.Data1 = data1 + delta1;
-                            dt.Data2 = data2 + delta2;
-                            dt.Time = startTimePacket.AddSeconds(j * interval);
-                            datalist.Add(dt);
-                            data1 = dt.Data1;
-                            data2 = dt.Data2;
-                            //startTime = dt.Time;
-                            j++;
+                                delta1 = Delta(data[i]);
+                                delta2 = Delta(data[i + 1]);
+                                dt.Data1 = data1 + delta1;
+                                dt.Data2 = data2 + delta2;
+                                dt.Time = startTimePacket.AddSeconds(j * interval);
+                                datalist.Add(dt);
+                                data1 = dt.Data1;
+                                data2 = dt.Data2;
+                                //startTime = dt.Time;
+                                j++;
+                            }
                         }
+                        else
+                        {
+                            for (int i = 15; i < data.Length-2; i += 2)
+                            {
+                                Datum dt = new Datum();
+                                dt.Serial = Serial;
+
+                                if (data[i] == 0x80)
+                                {
+                                    //data1 =2byte after 0x80
+                                    dt.Data1 = convertTemFrom15bit((data[i + 1] + data[i + 2] * 256), 10);
+                                    //data2
+                                    if (data[i + 3] == 0x80)
+                                    {
+                                        //data2= 2 byte after 0x80
+                                        dt.Data2 = convertTemFrom15bit((data[i + 4] + data[i + 5] * 256), 10);
+                                        i = i + 4;// i= i+6;
+                                    }
+                                    else
+                                    {
+                                        //data2= delta + previous data
+                                        delta2 = Delta(data[i + 3]);
+                                        dt.Data2 = data1 + delta1;
+                                        i = i + 2;//i=i+ 4;
+                                    }
+                                }
+                                else if (data[i + 1] == 0x80)
+                                {
+                                    //data1 = delta + previous data
+                                    delta1 = Delta(data[i]);
+                                    dt.Data1 = data1 + delta1;
+                                    //data 2= 2 byte after 0x80
+                                    dt.Data2 = convertTemFrom15bit((data[i + 2] + data[i + 3] * 256), 10);
+                                    i = i + 2;//i=i+ 4;
+                                }
+                                else
+                                {
+                                    delta1 = Delta(data[i]);
+                                    delta2 = Delta(data[i + 1]);
+                                    dt.Data1 = data1 + delta1;
+                                    dt.Data2 = data2 + delta2;
+                                }
+                                dt.Time = startTimePacket.AddSeconds(j * interval);
+                                datalist.Add(dt);
+                                data1 = dt.Data1;
+                                data2 = dt.Data2;
+                                j++;
+                            }
+                        }
+                        
                     }
 
 
