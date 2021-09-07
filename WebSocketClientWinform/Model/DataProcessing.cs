@@ -193,31 +193,32 @@ namespace UDPServerAndWebSocketClient
                     }
                     else
                     {
-                        int packetAndNumOfMeas = data[7] + (data[8] << 8) + (data[9] << 16) + (data[10] << 24);//in version 1.12 packet replaced = unix time 
+                        //int packetAndNumOfMeas = data[7] + (data[8] << 8) + (data[9] << 16) + (data[10] << 24);//in version 1.12 packet replaced = unix time 
+                        UInt32 packetAndNumOfMeas = (uint)(data[7] | (data[8] << 8) | (data[9] << 16) | (data[10] << 24));//in version 1.12 packet replaced = unix time 
                         //packet= time stamp (second)
-                        package = packetAndNumOfMeas & 0x7FFFFFF;
-                        int numberOfMeas = packetAndNumOfMeas >> 27;
-                        double data1 = convertTemFrom15bit((data[12] + data[13] * 256), 10);
-                        double data2 = convertTemFrom15bit((data[14] + data[15] * 256), 10);
+                        package = (int)(packetAndNumOfMeas & 0x7FFFFFF);
+                        int numberOfMeas = (int)(packetAndNumOfMeas >> 27);
+                        double data1 = convertTemFrom15bit((data[11] + data[12] * 256), 10);
+                        double data2 = convertTemFrom15bit((data[13] + data[14] * 256), 10);
                         double delta1 = 0, delta2 = 0;
+                        
                         DateTime startTime = DateTime.Parse(rcst.Starttime);
-                        DateTime startTimePacket = UnixTimeStampToDateTime(package, startTime);
+                        DateTime startTimePacket = UnixTimeStampToDateTime(package * interval, startTime);
+                        Console.WriteLine("Meas: "+ numberOfMeas+ " ,tmst: "+package+  " , starttime packet: " + startTimePacket);
                         //first data of packet
                         Datum dtFirt = new Datum();
                         dtFirt.Serial = Serial;
                         dtFirt.Data1 = data1;
                         dtFirt.Data2 = data2;
-                        //startTimePacket = startTimePacket.AddSeconds((dataPerPacket * package) * interval);
-                        // Console.WriteLine("D0: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime + ", Continue Mem Count: " + rcst.ContinueMemoryCount);
-                        string mesLog = Serial + "," + startTimePacket.ToString() + "," + "D0" + "," + rcst.ContinueMemoryCount + "," + package + "," + data1 + "," + data2;
-                        Utilities.WriteLogDebug(mesLog);
+             
                         dtFirt.Time = startTimePacket;
                         datalist.Add(dtFirt);
                         int j = 1;
-                        for (int i = 16; i < 16 + (data[11]-1) * 2; i += 2)
+                        for (int i = 15; i < 15 + (numberOfMeas-1) * 2; i += 2)
                         {
                             Datum dt = new Datum();
                             dt.Serial = Serial;
+
                             delta1 = Delta(data[i]);
                             delta2 = Delta(data[i + 1]);
                             dt.Data1 = data1 + delta1;

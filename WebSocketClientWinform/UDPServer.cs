@@ -319,8 +319,8 @@ namespace UDPServerAndWebSocketClient
                                         string serialNumber = (char)(dataReceive[5]) + dataReceive[1].ToString("00") + dataReceive[0].ToString("00") + serialno;
                                         string packetType = Encoding.ASCII.GetString(dataReceive, 6, 2);
                                         int package = dataReceive[7] + (dataReceive[8] << 8) + (dataReceive[9] << 16);
-                                        Console.WriteLine(DateTime.Now.ToString("dd/MMM/yy HH:mm:ss") + ", " + "Serial: " + serialNumber + ", packetType: " + dataReceive[6].ToString("X") + ":" + dataReceive[7].ToString("X") +
-                                           ", DataPerPacket= "+ dataReceive[10]+ ", Packetnumber: " + package);
+                                        //Console.WriteLine(DateTime.Now.ToString("dd/MMM/yy HH:mm:ss") + ", " + "Serial: " + serialNumber + ", packetType: " + dataReceive[6].ToString("X") + ":" + dataReceive[7].ToString("X") +
+                                        //   ", DataPerPacket= "+ dataReceive[10]+ ", Packetnumber: " + package);
 
                                         //Utilities.WriteLog("S/N: " + serialNumber + " Type: " + packetType + "Data: " + Helper.ToHexString(dataReceive));
                                         Utilities.WriteLogPackType(DateTime.Now.ToString("g") + ", " + serialNumber + "," +dataReceive[6].ToString("X")+dataReceive[7].ToString("X") + "," +package +"," +dataReceive[10] +","+ Helper.ToHexString(dataReceive));
