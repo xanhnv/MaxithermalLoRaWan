@@ -168,7 +168,7 @@ namespace UDPServerAndWebSocketClient
                         dtFirt.Serial = Serial;
                         dtFirt.Data1 = data1;
                         dtFirt.Data2 = data2;
-                        startTime = startTime.AddSeconds((rcst.ContinueMemoryCount.GetValueOrDefault() * numOfDt + dataPerPacket * package) * interval);
+                        startTime = startTime.AddSeconds((rcst.ContinueMemoryCount * numOfDt + dataPerPacket * package) * interval);
                         //Console.WriteLine("a Packet: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime + ", Continue Mem Count: " + rcst.ContinueMemoryCount);
                         string mesLog = Serial + "," + startTime.ToString() + "," + "D0" + "," + rcst.ContinueMemoryCount + "," + package + "," + data1 + "," + data2;
                         Utilities.WriteLogDebug(mesLog);
@@ -204,7 +204,7 @@ namespace UDPServerAndWebSocketClient
                         
                         DateTime startTime = DateTime.Parse(rcst.Starttime);
                         DateTime startTimePacket = UnixTimeStampToDateTime(package * interval, startTime);
-                        Console.WriteLine("Meas: "+ numberOfMeas+ " ,tmst: "+package+  " , starttime packet: " + startTimePacket);
+                       // Console.WriteLine(Serial+", Meas: "+ numberOfMeas+ " ,tmst: "+package+  " , starttime packet: " + startTimePacket);
                         //first data of packet
                         Datum dtFirt = new Datum();
                         dtFirt.Serial = Serial;
@@ -235,7 +235,7 @@ namespace UDPServerAndWebSocketClient
                         }
                         else
                         {
-                            for (int i = 15; i < data.Length-2; i += 2)
+                            for (int i = 15; i < data.Length; i += 2)
                             {
                                 Datum dt = new Datum();
                                 dt.Serial = Serial;
@@ -255,7 +255,7 @@ namespace UDPServerAndWebSocketClient
                                     {
                                         //data2= delta + previous data
                                         delta2 = Delta(data[i + 3]);
-                                        dt.Data2 = data1 + delta1;
+                                        dt.Data2 = data2 + delta1;
                                         i = i + 2;//i=i+ 4;
                                     }
                                 }
@@ -372,7 +372,7 @@ namespace UDPServerAndWebSocketClient
                         dtFirt.Serial = Serial;
                         dtFirt.Data1 = data1;
                         dtFirt.Data2 = data2;
-                        startTime = startTime.AddSeconds((rcst.ContinueMemoryCount.GetValueOrDefault() * numOfDt + dataPerPacket * package + 21) * interval);
+                        startTime = startTime.AddSeconds((rcst.ContinueMemoryCount * numOfDt + dataPerPacket * package + 21) * interval);
                         //Console.WriteLine("Packet: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime);
                         // Console.WriteLine("D1: " + package + ", Data 1: " + data1 + " Data2: " + data2 + " Start time: " + startTime + ", Continue Mem Count: " + rcst.ContinueMemoryCount);
                         string mesLog = Serial + "," + startTime.ToString() + "," + "D1" + "," + rcst.ContinueMemoryCount + "," + package + "," + data1 + "," + data2;
@@ -528,7 +528,7 @@ namespace UDPServerAndWebSocketClient
                         dtFirt.Serial = Serial;
                         dtFirt.Data1 = data1;
                         dtFirt.Data2 = data2;
-                        startTime = startTime.AddSeconds((rcst.ContinueMemoryCount.GetValueOrDefault() * numOfDt + dataPerPacket * package + 42) * interval);
+                        startTime = startTime.AddSeconds((rcst.ContinueMemoryCount * numOfDt + dataPerPacket * package + 42) * interval);
                         dtFirt.Time = startTime;
                         datalist.Add(dtFirt);
                         int j = 1;

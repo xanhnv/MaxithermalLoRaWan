@@ -16,7 +16,7 @@ namespace MaxithermalWebApplication.Models
     public partial class Pexo63LorawanEntities : DbContext
     {
         public Pexo63LorawanEntities()
-            : base("name=Pexo63LorawanEntities1")
+            : base("name=Pexo63LorawanEntities")
         {
         }
     

@@ -29,7 +29,7 @@ namespace UDPServerAndWebSocketClient
         FormMain form1;
         List<byte[]> listDev = new List<byte[]>();
         //static string nwKey = "11E6FD2D9AC364C607B02E32049C586D";
-        static string nwKey = "21E6FD2D9AC364C607B02E32049C586D";
+        static string nwKey = "21E6FD2D9AC364C607B02E32049C586D";//
         static string appKey = "50AECEA6ADE24F911E3028504B0F6E28";
         DataProcessing dataProcessing = new DataProcessing();
         /// <summary>
@@ -232,6 +232,10 @@ namespace UDPServerAndWebSocketClient
                         setting[26] = rcst.IntervalSendLoraHour;//interval send lora hour
                         setting[27] = rcst.IntervalSendLoraMin;//interval send lora Min
                         setting[28] = rcst.Delay;//delay start
+                        if (rcst.Description.Contains("EN"))
+                        {
+                            setting = Encoding.ASCII.GetBytes("EN");
+                        }
                         return setting;
                     }
                     return new byte[] { 0 };
@@ -283,11 +287,18 @@ namespace UDPServerAndWebSocketClient
                         if (json.ContainsKey("rxpk"))
                         {
                             var data = json["rxpk"][0]["data"];
-                            var timeStamp = json["rxpk"][0]["tmst"];
-
+                            JToken timeStamp = null;
+                            timeStamp= json["rxpk"][0]["tmst"];
+                            Console.WriteLine("tmst: "+ timeStamp);
                             if (data != null)
                             {
                                 var phyLoadData = Convert.FromBase64String(data.ToString());
+                                string phyLoadString = Helper.ToHexString(phyLoadData);
+                                Console.WriteLine(phyLoadString+ ", length: "+phyLoadString.Length);
+                                if (phyLoadString.Length==23)
+                                {
+                                    Console.WriteLine("Goi join OTAA");
+                                }
                                 var phyPayload = new PHYPayload(phyLoadData, nwKey, appKey);
                                 var m = (DataMessageWithKey)phyPayload.Message;
                                 var ttt = m.Pirnt();
@@ -344,6 +355,7 @@ namespace UDPServerAndWebSocketClient
                                         {
                                             payload = GetDataSetting(serialNumber, packetType);
                                         }
+
                                         //string testEendFromServer = "EN" ;
                                         //if (serialNumber== "N220080055")
                                         //{
@@ -461,7 +473,7 @@ namespace UDPServerAndWebSocketClient
                     serverSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, epSender,
                                 new AsyncCallback(OnSend), epSender);
 
-                    Console.WriteLine("SEND: {0}, {1}", text, "IP: " + epSender.ToString());
+                    //Console.WriteLine("SEND: {0}, {1}", text, "IP: " + epSender.ToString());
                 }
                 catch (Exception ex)
                 {

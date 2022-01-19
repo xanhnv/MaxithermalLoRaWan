@@ -94,13 +94,15 @@
           <Property Name="IntervalMin" Type="tinyint" Nullable="false" />
           <Property Name="IntervalHour" Type="tinyint" Nullable="false" />
           <Property Name="ContinueMem" Type="bit" Nullable="false" />
-          <Property Name="ContinueMemoryCount" Type="smallint" />
           <Property Name="Stopkey" Type="bit" Nullable="false" />
           <Property Name="AutoStart" Type="bit" Nullable="false" />
           <Property Name="IntervalSendLoraMin" Type="tinyint" Nullable="false" />
           <Property Name="IntervalSendLoraHour" Type="tinyint" Nullable="false" />
           <Property Name="IntervalSendLoraDay" Type="tinyint" Nullable="false" />
+          <Property Name="ContinueMemoryCount" Type="smallint" Nullable="false" />
           <Property Name="Devicetype" Type="tinyint" Nullable="false" />
+          <Property Name="NumberOfMeasD0" Type="tinyint" />
+          <Property Name="NumberOfMeasD1" Type="tinyint" />
           <Property Name="TimezoneId" Type="text" />
           <Property Name="FirmwareVer" Type="text" />
           <Property Name="SettingByLora" Type="bit" Nullable="false" />
@@ -271,7 +273,9 @@
           <NavigationProperty Name="Alarm" Relationship="Self.FK_Alarm_Settings" FromRole="Settings" ToRole="Alarm" />
           <NavigationProperty Name="Data" Relationship="Self.FK_Data_Settings" FromRole="Settings" ToRole="Data" />
           <NavigationProperty Name="Realtime" Relationship="Self.FK_Realtime_Settings" FromRole="Settings" ToRole="Realtime" />
-          <Property Name="ContinueMemoryCount" Type="Int16" />
+          <Property Name="ContinueMemoryCount" Type="Int16" Nullable="false" />
+          <Property Name="NumberOfMeasD0" Type="Byte" />
+          <Property Name="NumberOfMeasD1" Type="Byte" />
         </EntityType>
         <Association Name="FK_Alarm_Settings">
           <End Role="Settings" Type="Self.Setting" Multiplicity="1" />
@@ -416,6 +420,8 @@
           <EntitySetMapping Name="Settings">
             <EntityTypeMapping TypeName="Pexo63LorawanModel.Setting">
               <MappingFragment StoreEntitySet="Settings">
+                <ScalarProperty Name="NumberOfMeasD1" ColumnName="NumberOfMeasD1" />
+                <ScalarProperty Name="NumberOfMeasD0" ColumnName="NumberOfMeasD0" />
                 <ScalarProperty Name="ContinueMemoryCount" ColumnName="ContinueMemoryCount" />
                 <ScalarProperty Name="Serial" ColumnName="Serial" />
                 <ScalarProperty Name="Description" ColumnName="Description" />

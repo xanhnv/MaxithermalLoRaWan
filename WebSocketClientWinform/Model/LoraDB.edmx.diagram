@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="67e9eb2ea1794c779309a95d89682ff4" Name="Diagram1">
+      <Diagram DiagramId="67e9eb2ea1794c779309a95d89682ff4" Name="Diagram1" ZoomLevel="72">
         <EntityTypeShape EntityType="Pexo63LorawanModel.Alarm" Width="1.5" PointX="3" PointY="1.25" IsExpanded="true" />
         <EntityTypeShape EntityType="Pexo63LorawanModel.Datum" Width="1.5" PointX="3" PointY="5.625" IsExpanded="true" />
         <EntityTypeShape EntityType="Pexo63LorawanModel.Device" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />

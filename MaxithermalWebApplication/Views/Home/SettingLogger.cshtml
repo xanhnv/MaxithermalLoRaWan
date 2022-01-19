@@ -38,7 +38,7 @@
                 min="0"
                 maxlength="3"
                 max="365">*@
-            @Html.EditorFor(model => model.DurationDay, new { htmlAttributes = new { @class = "form-control", @min="0",@max= "365"} })
+            @Html.EditorFor(model => model.DurationDay, new { htmlAttributes = new { @class = "form-control", @min = "0", @max = "365" } })
             @Html.ValidationMessageFor(model => model.DurationDay, "", new { @class = "text-danger" })
         </div>
         <div class="col-md-1">
@@ -125,7 +125,7 @@
     </div>
 
 
-   
+
     <div class="row">
         <label class="control-label col-md-2">Period send data</label>
         <div class="col-md-2">
@@ -192,7 +192,7 @@
             }
             else
             {
-                @Html.EditorFor(model => model.Alarm.LowAlarmTemp, new { htmlAttributes = new { @class = "form-control", @disabled="disabled" } })
+                @Html.EditorFor(model => model.Alarm.LowAlarmTemp, new { htmlAttributes = new { @class = "form-control", @disabled = "disabled" } })
             }
 
             @Html.ValidationMessageFor(model => model.Alarm.LowAlarmTemp, "", new { @class = "text-danger" })
@@ -240,6 +240,7 @@
             @Html.ValidationMessageFor(model => model.Alarm.LowAlarmHumid, "", new { @class = "text-danger" })
         </div>
     </div>
+ 
     @*<div class="form-group">
             <label class="control-label col-md-2">Auto start</label>
             <div class="col-md-10">

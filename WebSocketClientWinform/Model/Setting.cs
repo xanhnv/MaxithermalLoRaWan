@@ -45,7 +45,9 @@ namespace UDPServerAndWebSocketClient.Model
         public string TimezoneId { get; set; }
         public string FirmwareVer { get; set; }
         public bool SettingByLora { get; set; }
-        public Nullable<short> ContinueMemoryCount { get; set; }
+        public short ContinueMemoryCount { get; set; }
+        public Nullable<byte> NumberOfMeasD0 { get; set; }
+        public Nullable<byte> NumberOfMeasD1 { get; set; }
     
         public virtual Alarm Alarm { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
