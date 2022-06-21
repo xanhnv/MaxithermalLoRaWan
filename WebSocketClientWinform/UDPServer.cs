@@ -238,10 +238,10 @@ namespace UDPServerAndWebSocketClient
                         }
                         return setting;
                     }
-                    return new byte[] { 0 };
+                    return new byte[] { 0x52, 0x54 };
                 }
             }
-            return new byte[] { 0 };
+            return new byte[] { 0x52, 0x54 };
         }
         void InitAdd()
         {
@@ -299,6 +299,7 @@ namespace UDPServerAndWebSocketClient
                                 {
                                     Console.WriteLine("Goi join OTAA");
                                 }
+   
                                 var phyPayload = new PHYPayload(phyLoadData, nwKey, appKey);
                                 var m = (DataMessageWithKey)phyPayload.Message;
                                 var ttt = m.Pirnt();
@@ -308,6 +309,10 @@ namespace UDPServerAndWebSocketClient
                                 //SendTestACK(encrypt, devAdd, double.Parse(timeStamp.ToString()));
                                 if (dataProcessing.CheckExistDevice(devAdd))
                                 {
+                                    if (phyLoadString.Length == 2)
+                                    {
+                                        Console.WriteLine("Goi data loi cua Loc");
+                                    }
                                     string frmPayloadStr = "MACAdd: " + Helper.ToHexString(devAdd);
                                     frmPayloadStr += "  FRMPayload: " + m.GetFRMPayLoadDecryptedString();
                                     counterUp = m.FHDR.FCnt[0] * 256 + m.FHDR.FCnt[1];
@@ -322,19 +327,24 @@ namespace UDPServerAndWebSocketClient
                                         //{
                                         //    return;
                                         //}
-                                        //if (dataReceive.Length < 40)
-                                        //{
-                                        //    return;
-                                        //}
+                                        if (dataReceive.Length ==2)
+                                        {
+                                            Console.WriteLine("Loc");
+                                        }
                                         string serialno = (dataReceive[4] * Math.Pow(2, 16) + dataReceive[3] * Math.Pow(2, 8) + dataReceive[2]).ToString("00000");
                                         string serialNumber = (char)(dataReceive[5]) + dataReceive[1].ToString("00") + dataReceive[0].ToString("00") + serialno;
                                         string packetType = Encoding.ASCII.GetString(dataReceive, 6, 2);
-                                        int package = dataReceive[7] + (dataReceive[8] << 8) + (dataReceive[9] << 16);
-                                        //Console.WriteLine(DateTime.Now.ToString("dd/MMM/yy HH:mm:ss") + ", " + "Serial: " + serialNumber + ", packetType: " + dataReceive[6].ToString("X") + ":" + dataReceive[7].ToString("X") +
-                                        //   ", DataPerPacket= "+ dataReceive[10]+ ", Packetnumber: " + package);
+                                        ////
+                                        UInt32 packetAndNumOfMeas = (uint)(dataReceive[7] | (dataReceive[8] << 8) | (dataReceive[9] << 16) | (dataReceive[10] << 24));//in version 1.12 packet replaced = unix time 
+                                        int package = (int)(packetAndNumOfMeas & 0x7FFFFFF);                                                                                                  //packet= time stamp (second)
+                                        //int package = dataReceive[7] + (dataReceive[8] << 8) + (dataReceive[9] << 16);
+                                        Console.WriteLine(DateTime.Now.ToString("dd/MMM/yy HH:mm:ss") + ", " + "Serial: " + serialNumber + ", packetType: " + dataReceive[6].ToString("X") + ":" + dataReceive[7].ToString("X") +
+                                          ", DataPerPacket= "+ dataReceive[10]+ ", Packetnumber: " + package);
 
                                         //Utilities.WriteLog("S/N: " + serialNumber + " Type: " + packetType + "Data: " + Helper.ToHexString(dataReceive));
-                                        Utilities.WriteLogPackType(DateTime.Now.ToString("g") + ", " + serialNumber + "," +dataReceive[6].ToString("X")+dataReceive[7].ToString("X") + "," +package +"," +dataReceive[10] +","+ Helper.ToHexString(dataReceive));
+                                     
+                                        int numberOfMeas = (int)(packetAndNumOfMeas >> 27);
+                                        Utilities.WriteLogPackType(DateTime.Now.ToString("g") + ", " + serialNumber + "," +dataReceive[6].ToString("X")+dataReceive[7].ToString("X") + "," +package +"," + numberOfMeas/*dataReceive[10]*/ + ","+ Helper.ToHexString(dataReceive));
 
                                         if (dataReceive[6] == 0xd0 || dataReceive[6] == 0xa0)
                                         {
@@ -350,7 +360,9 @@ namespace UDPServerAndWebSocketClient
 
                                         //Send data to node
                                         counterUp++;
-                                        byte[] payload = { 0 }; //data to send to node (may be setting data...)
+
+                                        byte[] payload = { 0, 0 }; //data to send to node (may be setting data...)
+                                        Array.Copy(Encoding.ASCII.GetBytes("RT"), payload, 2);
                                         if (packetType != "S1" || packetType != "S2" || packetType != "S3")
                                         {
                                             payload = GetDataSetting(serialNumber, packetType);
@@ -473,7 +485,7 @@ namespace UDPServerAndWebSocketClient
                     serverSocket.BeginSendTo(data, 0, data.Length, SocketFlags.None, epSender,
                                 new AsyncCallback(OnSend), epSender);
 
-                    //Console.WriteLine("SEND: {0}, {1}", text, "IP: " + epSender.ToString());
+                    Console.WriteLine("SEND: {0}, {1}", text, "IP: " + epSender.ToString());
                 }
                 catch (Exception ex)
                 {

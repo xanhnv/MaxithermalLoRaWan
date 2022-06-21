@@ -53,7 +53,7 @@ namespace UDPServerAndWebSocketClient
             #endregion
             //init UDP Socket
             UDPSocket s = new UDPSocket(this);
-            s.Server(17000);
+            s.Server(18000);
             LoadDB();
             RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             if (registryKey.GetValue("MaxithermalLoraWebSocket")==null)
